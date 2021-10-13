@@ -1,0 +1,310 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/product/add.css') }}">
+{%endblock%}
+
+
+{% block title %}{{"Agregar" if mode == "add" else "Editar"}} Producto{%endblock%}
+
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li>
+        {% if mode=="edit" %}
+            {% if not workday_token is none %}
+            <a href="{{url_for('workday.product_add', product_token=product.token, token=workday_token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a>
+            {% elif not shoppingday_token is none %}
+            <a href="{{url_for('shoppingday.product_add', product_token=product.token, token=shoppingday_token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a>
+            {% else %}
+            <a href="{{url_for('product.details', token=product.token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a>
+            {% endif %}
+        {% else %}
+            {% if not workday_token is none %}
+            <a href="{{url_for('product.view_list', workday_token=workday_token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a>
+            {% elif not shoppingday_token is none %}
+            <a href="{{url_for('product.view_list', shoppingday_token=shoppingday_token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a>
+            {% else %}
+            <a href="{{url_for('product.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a>
+            {% endif %}
+        {% endif %}
+    </li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block content %}
+<section>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col s12">
+                <h1 class="h1-size white-text uppercase-font ">{{"Agregar" if mode == "add" else "Editar"}} Producto</h1>
+            </div>
+
+            <div class="col l9 m12 s12">
+                <div class="card background-2f border-radius-10">
+
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" value="{{ workday_token }}" id="workday_token_input">
+                        <input type="hidden" value="{{ shoppingday_token }}" id="shoppingday_token_input">
+                        <input type="hidden" value="0" id="search_page_number">
+                        <input type="hidden" value="product" id="url_addres_type">
+
+                        <div class="card-content">
+                            <!-- FORM -->
+                            <div class="row no-margin">
+                                <!-- PRODUCT NAME -->
+                                <div class="input-field col l11 m10 s9">
+                                    {{ form.product.label }}
+                                    {{ form.product }}
+                                    {% for error in form.product.errors %}
+                                    <span class="msg-error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                                <!-- SEARCH PRODUCT BTN -->
+                                <div class="input-field col l1 m2 s3">
+                                    <a href="#" class="btn btn-block btn-flat white-text btn-search disabled tooltipped no-margin" id="search_btn"
+                                        data-position="bottom" data-tooltip="Buscar"><i class="material-icons center">search</i></a>
+                                </div>
+
+                                <div class="col l12 m12 s12 no-display" id="search_results">
+                                    <p class="white-text cursor-pointer tooltipped" id="close_search_results"><i class="right material-icons">close</i></p>
+                                    <p class="white-text title">Resultados de Búsqueda</p>
+
+                                    <div class="progress" id="search_loader">
+                                    </div>
+
+                                    <ul class="collection search-results previous_next_search">
+
+                                        <div class="row no-display" id="previous_next_search">
+                                            <div class="col l6 m6 s6">
+                                                <a href="#!" id="previous_search" class="disabled">
+                                                    <li class="collection-item result hoverable">
+                                                        <i class="left material-icons">chevron_left</i>
+                                                        <span class="left-align">Anterior</span>
+                                                    </li>
+                                                </a>
+
+                                            </div>
+
+                                            <div class="col l6 m6 s6">
+                                                <a href="#!" id="next_search" class="disabled">
+                                                    <li class="collection-item result hoverable">
+                                                        <i class="right material-icons">chevron_right</i>
+                                                        <p class="right-align">Próximo</p>
+                                                    </li>
+                                                </a>
+
+                                            </div>
+                                        </div>
+
+                                    </ul>  
+
+                                    <ul class="collection search-results" id="results_list">
+
+                                    </ul>                                  
+                                </div>                   
+
+                    
+                                <!-- DESCRIPTION -->
+                                <div id="form_fields">
+                                    <div class="input-field col s12 m12">
+                                        {{ form.description.label }}
+                                        {{ form.description }}
+                                        {% for error in form.description.errors %}
+                                        <span class="msg-error">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- COST -->
+                                    <div class="input-field col l6 m6 s12">
+                                        {{ form.cost.label }}
+                                        {{ form.cost }}
+                                        {% for error in form.cost.errors %}
+                                        <span class="msg-error">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- PLUS COST -->
+                                    <div class="input-field col l6 m6 s12">
+                                        {{ form.extra_cost.label }}
+                                        {{ form.extra_cost }}
+                                        {% for error in form.extra_cost.errors %}
+                                        <span class="msg-error">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- DEFAULT PRICE -->
+                                    <div class="input-field col l6 m6 s12">
+                                        {{ form.default_price.label }}
+                                        {{ form.default_price }}
+                                        {% for error in form.default_price.errors %}
+                                        <span class="msg-error">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                        
+                                    <!-- QUANTITY -->
+                                    <div class="input-field col l6 m6 s12">
+                                        {% if mode == "edit" %}
+                                        <label for="quantity">Cantidad: (Stock Actual {{product.get_stock()}})</label>
+                                        {% else %}
+                                        <label for="quantity">Cantidad</label>
+                                        {% endif %}
+                        
+                                        {{ form.quantity }}
+                        
+                                        {% for error in form.quantity.errors %}
+                                        <span class="msg-error">{{ error }}</span>
+                                        {% endfor %}
+                                    </div>
+                        
+                                    <!-- CONDITION -->
+                                    <div class="col l6 m6 s12">
+                                        <label for="new" class="uppercase-font">Condición:</label>
+                                        <p>
+                                            <label>
+                                                <input id="new1" name="new" type="radio" class="with-gap" value="1" {% if form.new.data=="1"%}checked="checked" {% endif %}>
+                                                <span>Nuevo</span>
+                                            </label>
+                                            <label>
+                                                <input id="new2" name="new" type="radio" class="with-gap" value="0" {% if form.new.data=="0"%}checked="checked" {% endif %}>
+                                                <span>Usado</span>
+                                            </label>
+                                        </p>
+                                    </div>
+
+                                    <!-- STATUS -->
+                                    <div class="col l6 m6 s12">
+                                        <label for="status" class="uppercase-font">Estado:</label>
+                                        <p>
+                                            <label>
+                                                <input id="status1" name="status" type="radio" class="with-gap" value="1" {% if
+                                                    form.status.data=="1" %}checked="checked" {% endif %}>
+                                                <span>Activo</span>
+                                            </label>
+                                            <label>
+                                                <input id="status2" name="status" type="radio" class="with-gap" value="0" {% if
+                                                    form.status.data=="0" %}checked="checked" {% endif %}>
+                                                <span>Inactivo</span>
+                                            </label>
+                                        </p>
+                                    </div>
+                                </div>
+                            
+                            </div>                            
+                        </div>
+
+                        <div class="card-action">
+                            <!-- FORM SUBMITS BUTTONS -->
+                            <div class="row center no-margin-bottom">
+                                <div class="col l4 m4 s6" id="btn-cancel">
+                                    {% if mode=="edit" %}
+                                        {% if not workday_token is none %}
+                                        <a href="{{url_for('workday.product_add', product_token=product.token, token=workday_token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                        {% elif not shoppingday_token is none %}
+                                        <a href="{{url_for('shoppingday.product_add', product_token=product.token, token=shoppingday_token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                        {% else %}
+                                        <a href="{{url_for('product.details', token=product.token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if not workday_token is none %}
+                                        <a href="{{url_for('product.view_list', workday_token=workday_token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                        {% elif not shoppingday_token is none %}
+                                        <a href="{{url_for('product.view_list', shoppingday_token=shoppingday_token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                        {% else %}
+                                        <a href="{{url_for('product.view_list')}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+
+                                {% if show_finish %}
+                                <div class="col l4 m4 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit" name="submit" type="submit" value="Guardar"> -->
+                                </div>
+                                {% else %}
+                                <div class="col l4 m4 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin", disabled="true") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit" name="submit" type="submit" value="Guardar"> -->
+                                </div>
+                                {% endif %}
+                    
+                                <div class="col l4 m4 s12">
+                                    {{ form.submit_and_finish(class="btn btn-save btn-flat btn-normal-margin") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit_and_finish" name="submit_and_finish" type="submit" value="Guardar y Finalizar"> -->
+                                </div>                                
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+
+            <div class="col l3 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+
+                    <div class="card-content grey-text info-card" id="card_help">
+                        <span class="card-title uppercase-font center">Ayuda</span>
+                        <p>
+                            <strong>Stock:</strong>
+                            <br>
+                            &#9679; Ingrese un número positivo para agregar productos al stock, o negativo para quitarlos.
+                            <br>
+                            &#9679; Ingrese 0 para no modificarlo.
+                            <br>
+                            {% if mode=="add" %}
+                            &#9679; Si el producto ya existe, se añadirá el valor ingresado al stock actual.
+                            {% endif %}
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Matemática:</strong>
+                            <br>
+                            &#9679; Es posible utilizar calculos matemáticos en los campos <b>Costo</b>, <b>Costo Extra</b>, <b>Precio</b> y <b>Cantidad</b>.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Estado:</strong>
+                            <br>
+                            &#9679; <b>Activo:</b> El producto se mostrará en la lista de productos (siempre que tenga stock).
+                            <br>
+                            &#9679; <b>Inactivo:</b> El producto quedará oculto en la lista, y las búsquedas.
+                            <br>
+                            &#9679; Los productos inactivos pueden volverse activar posteriormente.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Guardar:</strong>
+                            <br>
+                            &#9679; <b>Guardar:</b> El producto se guardará en la base de datos y permitirá continuar con la carga de productos.
+                            <br>
+                            &#9679; <b>Guardar y Finalizar:</b> El producto se guardará en la base de datos, y finalizará la carga de productos.
+                            <br>
+                            &#9679; En algunos casos el botón <b>Guardar</b> no podrá ser presionado. Ejemplo, al editar un producto. 
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="hide-on-large-only">
+                <div class="fixed-action-btn">
+                    <a class="btn-floating btn-large" href="#card_help">
+                        <i class="large material-icons blue-text">help_outline</i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/admin/product/add.js') }}"></script>
+{% endblock %}

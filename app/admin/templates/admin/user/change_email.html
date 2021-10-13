@@ -1,0 +1,82 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth/form.css') }}">
+{%endblock%}
+
+
+{% block title %}Editar usuario - Credenciales{%endblock%}
+
+{% block content %}
+
+<section>
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col l3 m12 s12"></div>
+
+            <div class="col l6 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+                    <form method="post">
+                        <div class="card-content">
+                            <span class="card-title white-text uppercase-font center">Cambiar Correo Electrónico</span>
+                            
+                            {{form.hidden_tag()}}
+
+                            <div class="input-field">
+                                <input id="current_email" type="email" class="validate input {{invalid_email}}" name="current_email" value="{{process_form_data(form.current_email)}}"  required>
+                                <label for="current_email" class="label">Correo Electrónico (actual)</label>
+                                {% for error in form.current_email.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}
+                            </div>
+                
+                            <div class="input-field">
+                                <input id="current_password" type="password" class="validate input {{invalid_email}}" name="current_password" required>
+                                <label for="current_password" class="label">Contraseña (actual)</label>
+                                <p class="no-margin no-padding left-align field-icon"><i class="material-icons password-visibility white-text" data-target="current_password">visibility</i></p>
+                                {% for error in form.current_password.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}
+                            </div>
+
+                            <div class="input-field">
+                                <input id="email" type="email" class="validate input {{invalid_email}}" name="email" required>
+                                <label for="email" class="label">Correo Electrónico (nuevo)</label>
+                                {% for error in form.email.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}
+                            </div>
+
+                            <p class="amber-text text-darken-2"><i class="material-icons tiny">warning</i> La sesión se cerrará al guardar los cambios, deberá volver a iniciar sesión con las nuevas credenciales.</p>
+                        
+                        </div>
+
+                        <div class="card-action center-align">
+                            <button type="submit" id="submit" name="submit" class="btn btn-save">Guardar y Cerrar Sesión</button>
+                            
+                            <p class="grey-text">¿Quieres cambiar la contraseña? <a href="{{url_for('admin.user_change_password', **request.args)}}" class="blue-text text-darken-2">Pulsa aquí</a></p>
+                        </div>
+                    </form>
+
+
+                </div>
+
+            </div>
+
+            <div class="col l3 m12 s12"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+<!-- <script src="{{ url_for('static', filename='js/admin/product/add.js') }}"></script> -->
+{% endblock %}

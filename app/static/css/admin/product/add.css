@@ -1,0 +1,58 @@
+/* BUTTONS */
+.btn-floating{
+    border: 1px solid #2196f3;
+    background: none;
+}
+
+.btn-floating:hover,
+.btn-floating:active{
+    background-color: transparent;
+    color: white;
+    transition: .3s;
+}
+
+.btn-floating:active .material-icons{
+    color: white;
+    background: none;
+}
+
+
+/* SEARCH RESULTS */
+.search-results{
+    border: none;
+}
+
+.previous_next_search .results,
+.search-results .result{
+    background-color: transparent;
+    color: white;
+    border: 1px solid grey;
+    border-radius: 5px;
+    transition: .3s;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.previous_next_search .results,
+.search-results .result:last-child{
+    border-bottom: 1px solid grey;
+}
+
+.previous_next_search .results,
+.search-results .result:hover{
+    border: 1px solid white;
+    transition: .3s;
+}
+
+#previous_search.disabled .result,
+#next_search.disabled .result{
+    cursor: default;
+    color: grey;
+
+}
+
+#previous_search.disabled .result:hover,
+#next_search.disabled .result:hover{
+    border: 1px solid grey;
+
+}

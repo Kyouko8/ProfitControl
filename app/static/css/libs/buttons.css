@@ -1,0 +1,148 @@
+/* BUTTONS */
+.btn{
+    height: auto;
+    border-radius: 5px;
+    background: none;
+}
+
+.btn.btn-save{
+    border: 1px solid #4caf50;
+    transition: .3s;
+    color: #4caf50;
+}
+
+.btn.btn-save:hover{
+    background-color: #4caf50;
+    color: white;
+    transition: .3s;
+}
+
+.btn.btn-cancel{
+    border: 1px solid #f44336;
+    transition: .3s;
+    color: #f44336;
+}
+
+.btn.btn-cancel:hover{
+    background-color: #f44336;
+    color: white;
+    transition: .3s;
+}
+
+.btn.btn-search{
+    border: 1px solid grey
+}
+
+.btn.btn-search:hover{
+    background-color: #121212 !important;
+}
+
+.btn.disabled,
+.btn:disabled,
+.btn.disabled:hover,
+.btn:disabled:hover{
+    background-color: #121212 !important;
+    color: grey;
+    border: 1px solid grey !important;
+}
+
+.btn.btn-secondary{
+    background: none;
+    border: 1px solid #607d8b;
+    transition: .3s;
+    color: #b0bec5;
+}
+
+.btn.btn-secondary:hover{
+    background-color: #607d8b;
+    color: white;
+    transition: .3s;
+}
+
+.btn.btn-save:not(.btn-normal-margin),
+.btn.btn-cancel:not(.btn-normal-margin),
+.btn.btn-search:not(.btn-normal-margin),
+.btn.btn-secondary:not(.btn-normal-margin){
+    margin: 0px;
+}
+/* OPTION BUTTONS */
+.option-buttons{
+    margin-top: 1em;
+    margin-bottom: 0px;
+    transition: .3s;
+    max-width: 1280px;
+}
+
+.option-buttons .btn{
+    border-radius: 5px;
+    background: none;
+    border: 1px solid #2196f3;
+    color:  white;
+    height: auto;
+}
+
+.option-buttons .btn:hover,
+.option-buttons:not(.on-top) .btn{
+    background: #2196f3 !important;
+    color: white;
+}
+
+.option-buttons:not(.on-top) .btn{
+    opacity: 90%;
+    transition: .3s;
+    box-shadow:0px 0px 3px 3px rgba(10,10,10,0.06), 0px 0px 4px 4px rgba(10,10,10,0.02) !important;
+}
+
+.option-buttons:not(.on-top) .btn:hover{
+    opacity: 100%;
+    transition: .3s;
+    box-shadow:0px 0px 4px 4px rgba(10,10,10,0.16), 0px 0px 5px 5px rgba(10,10,10,0.08) !important;
+}
+
+.option-buttons .btn-cancel{
+    background: none;
+    border: 1px solid #f44336;
+    color: #f44336;
+    transition: .3s;
+}
+
+.option-buttons .btn-cancel:hover,
+.option-buttons:not(.on-top) .btn-cancel{
+    background: #f44336 !important;
+    color: white;
+    transition: .3s;
+}
+
+#options_fixed_action_btn a{
+    border: 1px solid #2196f3;
+}
+
+/* Navbar buttons */
+.nav-btn-delete {
+    color: #f44336 !important;
+}
+.nav-btn-delete.disabled,
+.nav-btn-delete:disabled{
+    color: grey !important;
+}
+
+@media screen and (min-width: 992px){
+    .option-buttons{
+        position: fixed;
+        z-index: 2;
+        width: 70%;
+    }
+}
+
+@media screen and (max-width: 992px){
+    /* BUTTONS */
+    .btn{
+        margin: 15px;
+    }
+
+    /* OPTION BUTTONS */
+    .option-buttons .btn{
+        margin: 5px;
+        height: auto;
+    }
+}

@@ -1,0 +1,553 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import draw_note, tooltip_percent, tooltip_for_total with context %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/workday/details.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %}Detalles del Día {{workday.get_format()}}{%endblock%}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('workday.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Add from list #}
+<li><a href="{{url_for('product.view_list', workday_token=workday.token)}}"><i class="left material-icons">playlist_add</i>Agregar Desde Lista</a></li>
+{# Normal Add #}
+<li><a href="{{url_for('workday.product_add', token=workday.token)}}"><i class="left material-icons">add</i>Agregar Manual</a></li>
+{# Spendings #}
+<li><a href="{{url_for('spending.view_list', workday_token=workday.token)}}"><i class="left material-icons">payments</i>Gastos del Día</a></li>
+{# Edit date #}
+<li><a href="{{url_for('workday.add', token=workday.token)}}"><i class="left material-icons">edit</i>Editar</a></li>
+{# By unit #}
+<li class="divider divider-option-buttons"></li>
+<li>
+{% if by_unit %}
+<a href="{{url_for('workday.details', token=workday.token, by_unit='false', resume=not (total is none))}}"><i class="left material-icons">filter_9_plus</i>Mostrar Totales</a> <!-- Unidad -->
+{% else %}
+<a href="{{url_for('workday.details', token=workday.token, resume=not (total is none))}}"><i class="left material-icons">filter_1</i>Mostrar por Unidad</a> <!-- Total -->
+{% endif %}</li>
+{# Delete #}
+<li class="divider divider-option-buttons"></li>
+<li><a data-url="{{url_for('workday.discard', token=workday.token)}}" class="nav-btn-delete btn-delete {% if not workday.can_be_deleted() %}disabled{% endif %}"><i class="left material-icons">delete</i>Descartar</a></li>
+{% endblock nav_options %}
+
+<!--Search Button -->
+{% block search_nav_button %}{% endblock search_nav_button %}
+
+
+{% block content %}
+{% set f = int %}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('workday.view_list')}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">arrow_back</i>Volver
+            </a>
+        </div>
+        
+        {# Edit date #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('workday.add', token=workday.token)}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">edit</i>Editar
+            </a>
+        </div>
+
+        {# Delete #}
+        <div class="col l4 m4 s12">
+            <a data-url="{{url_for('workday.discard', token=workday.token)}}" class="btn btn-block btn-cancel btn-delete {% if not workday.can_be_deleted() %}disabled{% endif %} margin-bottom-10"><i
+                    class="left material-icons">delete</i>Descartar</a>
+        </div>
+        
+        {# Add from list #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('product.view_list', workday_token=workday.token)}}" class="btn btn-block truncate">
+                <i class="left material-icons">playlist_add</i>Agregar Desde Lista
+            </a>
+        </div>
+        {# Normal Add #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('workday.product_add', token=workday.token)}}" class="btn btn-block truncate">
+                <i class="left material-icons">add</i>Agregar Manual
+            </a>
+        </div>
+        {# Spendings #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('spending.view_list', workday_token=workday.token)}}" class="btn btn-block truncate">
+                <i class="left material-icons">payments</i>Gastos del Día
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="container">
+
+    <div class="row no-margin">
+
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Ventas del Día: {{workday.get_format(" / ")}}</h1>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- VENTAS -->
+<section>
+    <div class="container">
+
+        <!-- EDIT NOTE SYSTEM -->
+        <div class="modal background-2f border-radius-10" id="setNoteModal">
+            <form method="post" action="{{url_for('workday.set_note', token=workday.token, **request.args)}}">
+                {{ form.hidden_tag() }}
+
+                <div class="modal-content">
+                    <!-- FORM -->
+                    <div class="row">
+                        <div class="col l12 m12 s12">
+                            <h1 class="h1-size white-text uppercase-font">Editar nota</h1>
+                        </div>
+
+                        <!-- NOTE -->
+                        <div class="input-field col l12 m12 s12">
+                            {{ form.note.label }}
+                            {{ form.note(class="materialize-textarea white-text", rows=6, maxlength=2048) }} <br />
+                            {% for error in form.note.errors %}
+                            <span class="text-red">{{ error }}</span>
+                            {% endfor %}
+                        </div> 
+                    </div>                           
+                </div>
+
+                <div class="modal-footer grey darken-4">
+                    <!-- FORM SUBMITS BUTTONS -->
+                    <div class="row center no-margin-bottom">                   
+                        <div class="col l6 m6 s6 center-align">
+                            <a href="#!" class="modal-close btn btn-cancel btn-flat">Cancelar</a>
+                        </div>
+                        <div class="col l6 m6 s6 center-align">
+                            {{ form.submit(class="btn btn-save btn-flat") }}
+                        </div>                    
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row no-margin">
+            {# Show/Hide-Resume #}
+            <div class="col l4 m6 s12 left-align">
+                {% if total is none %}
+                <a href="{{url_for('workday.details', token=workday.token, resume='true')}}" class="btn btn-secondary btn-block">
+                    <i class="left material-icons">visibility</i>Mostrar Resumen
+                </a>
+                {% else %}
+                <a href="{{url_for('workday.details', token=workday.token)}}" class="btn btn-secondary btn-block hide-summary">
+                    <i class="left material-icons">visibility_off</i>Ocultar Resumen
+                </a>
+                {% endif %}
+            </div>
+
+            
+            {# By Unit/Total #}
+            <div class="col l8 m12 s12 right-align hide-on-med-and-down">
+                {% if by_unit %}
+                <a class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-5 tooltipped" href="{{url_for('workday.details', token=workday.token, by_unit='false', resume=not (total is none))}}"
+                    data-position="bottom" data-tooltip="<b>Mostrando datos por unidad.</b><br>Toque para mostrar datos totales.">
+                    <i class="material-icons white-text">filter_1</i></a> <!-- Unidad -->
+                {% else %}
+                <a class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-5 tooltipped" href="{{url_for('workday.details', token=workday.token, resume=not (total is none))}}"
+                    data-position="bottom" data-tooltip="<b>Mostrando datos totales.</b><br>Toque para mostrar datos por undiad.">
+                    <i class="material-icons white-text">filter_9_plus</i></a> <!-- Total -->
+                {% endif %}
+                
+                <a href="#!" id="fast_search_switch" class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-5 tooltipped"
+                    data-position="bottom" data-tooltip="Buscar">
+                    <i class="material-icons">search</i></a>
+            </div>
+        </div>
+        <div class="row no-margin">
+
+            <!-- FastSearch -->
+            <div class="col l12 m12 s12 no-display" id="fast_search_section">
+                <p class="grey-text">Resultados de la búsqueda: <span id="searchNumberInfo">{{len(sales)}}</span> / {{len(sales)}} coincidencias</p>
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+                        <div class="row no-margin">
+                            <div class="col s9 m10 l11">
+                                <input  class="white-text" type="text" id="fast_search_input" placeholder="Búsqueda rápida">
+                            </div>
+                            <div class="col s2 m1 l1">
+                                <a href="#!" class="btn btn-flat btn-secondary center tooltipped" id="fast_search_mode" data-mode="all" data-position="bottom" data-tooltip="Buscar en todos">
+                                    <i class="tiny material-icons white-text center">filter_9_plus</i>    
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="col l12 m12 s12">
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+                        <input type="hidden" id="by_unit" value="{{int(by_unit)}}">
+                        <table id="sorted_table">
+                            <thead> 
+                                <tr class="grey-text">
+                                    {% set unity = "c/u" if by_unit else "total" %}
+                                    <th data-type="name">Nombre <i class="material-icons tiny"></i></th>
+                                    <th data-type="stock" class="center col-stock">Cantidad <i class="material-icons tiny"></i></th>
+                                    <th data-type="price" class="center col-price">Precio ({{unity}}) <i class="material-icons tiny"></i></th> 
+                                    <th data-type="price" class="center col-cost hide-on-small-only">Costo ({{unity}}) <i class="material-icons tiny"></i></th> {# dont show on mobile #}
+                                    <th data-type="price" class="center col-profit hide-on-1080-and-down">Ganancia ({{unity}}) <i class="material-icons tiny"></i></th> {# dont show on mobile, tablets #}
+                                    <th class="center hide-on-med-and-down">Opciones <i class="material-icons tiny"></i></th>
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                                {% for sale in sales %}
+                                    {% set unity = 1 if by_unit else sale.quantity %}
+                                    {% set cost = sale.cost %}
+                                    {% set product = cost.product %}
+                                    {% set product_stock = product.get_stock() %}
+        
+                                    <tr class="white-text lighten-3">
+                                        <!-- nombre -->
+                                        <td>
+                                            <a href="{{url_for('workday.product_sale_details', token=workday.token, list_sale_token=sale.token)}}"
+                                                class="white-text btn-open-in-new row-title">
+                                                <i class="tiny left material-icons hide-on-med-and-down">open_in_new</i>
+                                                {{product.get_name()}}
+                                            </a>
+                                        </td>
+
+                                        <!-- stock -->
+                                        <td class="center {% if not sale.quantity %}red-text lighten-3{%endif%}" id="sale_quantity_{{sale.token}}">
+                                            <button class="waves-effect waves-light btn-small btn-flat white-text btn-modify-stock btn-remove-stock hide-on-small-only {% if not sale.quantity or sale.quantity <= 1%}disabled{% endif %}" data-token="{{sale.token}}" data-workday="{{workday.token}}" data-mode="remove">
+                                                <i class="tiny material-icons">remove</i>
+                                            </button>
+                                            
+                                            <span class="stock"> {{sale.quantity}}</span>
+                                            
+                                            <button class="waves-effect waves-light btn-small btn-flat white-text btn-modify-stock btn-add-stock hide-on-small-only {% if product_stock == 0 %}disabled{% endif %}" data-token="{{sale.token}}" data-workday="{{workday.token}}" data-mode="add">
+                                                <i class="tiny material-icons">add</i>
+                                            </button>
+                                        </td>
+
+                                        <!-- precio -->
+                                        <td class="center blue-text darken-2" id="sale_price_{{sale.token}}">${{sale.price * unity}}</td>
+                                        <!-- cost -->
+                                        <td class="center hide-on-small-only red-text darken-4" id="sale_cost_{{sale.token}}">${{cost.get_real_cost() * unity}}</td> {# dont show on desktop #}
+                                        <!-- ganancia -->
+                                        <td class="center hide-on-1080-and-down green-text darken-4" id="sale_profit_{{sale.token}}">${{(sale.price - cost.get_real_cost()) * unity}}</td> {# dont show on desktop #}
+                                        
+                                        <!-- opciones -->
+                                        <td class="center row-options hide-on-med-and-down" style="width: 50px;">
+                                            <div class="row no-margin">
+                                                <div class="col l12 m12 s12">
+                                                    <a data-url="{{url_for('workday.product_delete_sale', token=workday.token, list_sale_token=sale.token)}}"
+                                                        class="btn btn-flat btn-block btn-delete">
+                                                        <i class="tiny material-icons center">delete</i>
+                                                    </a>
+                                                </div>                                                    
+                                            </div>
+                                        </td> {# dont show on mobile, tablets #}
+                                    </tr>
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {# Botón que reinicia la página cuando se hace un cambio de stock y el resumen es visible. #}
+            <div id="workday-results-restart" class="center no-display">
+                {% if not total is none %}
+                <div class="col s12 l6 m6 push-l3 push-m3">
+                    <a href="{{url_for('workday.details', token=workday.token, resume='true')}}" class="btn btn-block btn-secondary">
+                        <i class="left material-icons">refresh</i>Actualizar información del Resumen
+                    </a>
+                </div>
+                <div class="col s12 l12 m12 center-align">
+                    <p class="grey-text">Una o más ventas han sido modificadas, deberá actualizar la información para ver el resumen.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- RESUMEN -->
+<section>
+
+    <div class="container">
+
+        <div class="row"> 
+
+            <div class="workday-results" id="workday-results-section">
+                {% if not total is none %}
+                <div class="col s12 m12 l12">
+                    <h2 class="h2-size white-text uppercase-font">Resumen de Ventas</h2>
+                    <p class="grey-text">Con la venta de todos estos artículos se recaudaron <b>${{f(total.price)}}</b>, dejando una ganancia total de <b>${{f(total.profit)}}</b>.</p>
+
+                    <div class="card background-2f border-radius-10 hoverable">
+                        <div class="card-content white-text">
+                            <span class="card-title">Ventas</span>
+    
+                            <div class="row no-margin">
+                                <div class="col l6 m6 s12">
+                                    <p class="bold-font">Productos: <span class="right normal-font">{{f(total.quantity)}}</span></p>
+                                </div>
+                               
+                                <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                                <div class="col l6 m6 s12">
+                                    <p class="bold-font">Ventas: <span class="right normal-font">${{f(total.price)}}</span></p>
+                                </div>
+
+                                <div class="divider divider-custom"></div>
+
+                                <div class="col l6 m6 s12">
+                                    <p class="bold-font">Ganancia: <span class="right normal-font">${{f(total.profit)}}</span></p>
+                                </div>
+
+                                <div class="divider divider-custom hide-on-med-and-up"></div>
+                                
+                                <div class="col l6 m6 s12">
+                                    <p class="bold-font">Ganancia (por Persona): <span class="right normal-font">${{f(total.profit_profile)}}</span></p>
+                                </div>
+
+                                <div class="divider divider-custom"></div>
+
+                                <div class="col l6 m6 s12">
+                                    <p class="bold-font">Nro. Gastos: <span class="right normal-font">{{f(total.spendings.count)}}</span></p>
+                                </div>
+
+                                <div class="divider divider-custom hide-on-med-and-up"></div>
+                                
+                                <div class="col l6 m6 s12">
+                                    <p class="bold-font">Monto en Gastos: <span class="right normal-font">${{f(total.spendings.total)}}</span></p>
+                                </div>
+
+                                <div class="divider divider-custom"></div>
+                                
+                                <div class="col l12 m12 s12">
+                                    {% set progress = total.percent_profit_price %}
+                                    {% set progress_color = get_progress_color(progress) %}
+                                    <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                        data-tooltip='{{tooltip_percent(progress, "Ganancia", "Costo y Gastos", classes1="green-text", classes2="red-text", title="Ganancia", helper_text="Porcentaje de Ganancia (Gan/Pre)")}}'>
+                                        <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                                            <span class="progress-span">Ganancia {{f(int(progress))}}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="divider divider-custom"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GENERAL -->
+                <div class="col l12 m12 s12">
+                    <h2 class="h2-size white-text uppercase-font">Gastos</h2>
+                    <p class="grey-text">A continuación se muestran detalles de los gastos del negocio. Se han gastado <b>${{f(total.spendings.general_spending)}} en total</b>.</p>
+
+                    <div class="card background-2f border-radius-10 hoverable">
+                        <div class="card-content white-text">
+                            <span class="card-title">Gastos Generales</span>
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Nro. Gastos: <span class="right normal-font">{{f(total.spendings.general_count)}}</span></p>
+                            </div>
+
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                            <div class="col l6 m6 s12 tooltipped-click"  data-position="top" data-tooltip='{{tooltip_general_spendings(total)}}'>
+                                <p class="bold-font">Monto en Gastos: <span class="right normal-font">${{f(total.spendings.general_spending)}}</span></p>
+                            </div>
+                            
+                            <div class="divider divider-custom"></div>
+
+                            {% set general_spendings = percent(total.spendings.general_spending, total.spendings.total) %}
+                            <div class="col l12 m12 s12">
+                                {% set progress = general_spendings %}
+                                {% set progress_color = get_color(progress, 'red', 'orange', divider=60) %}
+                                <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                    data-tooltip='{{tooltip_percent(progress, "Gastos Generales", "Otros Gastos", classes1="orange-text", classes2="red-text", title="Gastos Generales", helper_text="Porcentaje de Gastos Generales")}}'>
+                                    <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                                        <span class="progress-span">Gastos Generales {{f(int(progress))}}%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="divider divider-custom"></div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- PERFILES -->
+                {% set one_profile = len(total.spendings.profiles) == 1 %}
+                    
+                <div class="col s12 m12 l12">
+                    <h2 class="h2-size white-text uppercase-font">Perfil{% if not one_profile %}es{% endif %}</h2>
+                    <p class="grey-text">A continuación se muestran detalles de cada perfil, sus correspondientes ganancias y gastos.</p>
+
+                </div>
+                
+                <div>
+                    {% for profile, data in total.spendings.profiles.items() %}
+        
+                        {% set progress = percent(total.profit_profile-data.spending, total.profit_profile)%}
+                        {% if int(total.profit_profile - data.spending) >= 0 %}
+                            {% set progress_color = "blue" %}
+                        {% else %}
+                            {% set progress_color = "red" %}
+                        {% endif %}
+                        {% set progress_color = get_progress_color(progress, value_red=0, value_orange=25, value_green=50) %}
+                        {% set profit_color = get_color(total.profit_profile - data.spending, "green", "red", divider=0) %}
+                        {% set spending_color = get_color(progress, "white", "red", divider=50) %}
+
+                    <div class="col {% if one_profile %}l12 m16 s12{% else %}l6 m6 s12{% endif %}">
+        
+                        <!-- INFO -->
+                        <div class="card background-2f border-radius-10 hoverable">
+                            <div class="card-content white-text">
+                                <span class="card-title">{{profile.name.upper()}}</span>
+        
+                                <div class="row no-margin">
+                                    <div class="col l12 m12 s12">
+                                        <p class="bold-font">Ganancia: <span class="right normal-font {{profit_color}}-text">${{f(int(total.profit_profile - data.spending))}}</span></p>
+                                    </div>
+                                   
+                                    <div class="divider divider-custom"></div>
+        
+                                    <div class="col l12 m12 s12 tooltipped-click"  data-position="top" data-tooltip='{{tooltip_profile_spendings(profile, data, total)}}'>
+                                        <p class="bold-font">Monto en Gastos: <span class="right normal-font">${{f(data.spending)}}</span></p>
+                                    </div>
+        
+                                    <div class="divider divider-custom"></div>
+        
+                                    <div class="col l12 m12 s12">
+                                        <p class="bold-font">Nro. Gastos: <span class="right normal-font">{{f(data.count)}}</span></p>
+                                    </div>
+                                    
+                                    <div class="divider divider-custom"></div>
+        
+                                    <div class="hide-on-large-only">
+                                        <div class="col l12 m12 s12">
+                                            <p class="bold-font">% de Gastos: <span class="right normal-font {{spending_color}}-text">{{f(percent(data.spending, total.profit_profile))}}%</span></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="hide-on-med-and-down">
+                                        <div class="col l12 m12 s12">
+                                            <p class="bold-font">Porcentaje de Gastos: <span class="right normal-font {{spending_color}}-text">{{f(percent(data.spending, total.profit_profile))}}%</span></p>
+                                        </div>
+                                    </div>
+        
+                                    <div class="divider divider-custom"></div>
+        
+                                    <div class="col l12 m12 s12">
+                                        <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                            data-tooltip='{{tooltip_percent(progress, "Ganancia", "Gastos", classes1="green-text", classes2="red-text", title=profile.name.upper(), helper_text="Porcentaje de Ganancia")}}'>
+                                        
+                                            <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                                                <span class="progress-span">Ganancia {{f(progress)}}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- NOTE -->
+<section id="s-note">
+    <div class="container">
+        <div class="row">
+            <div class="col l12 m12 s12">
+                <h2 class="h2-size white-text uppercase-font">Nota del Día</h2>
+            </div>
+
+            <div class="col l4 m6 s12 left-align">
+                {% if not workday.note is none %}
+                <a href="#setNoteModal" class="btn btn-flat btn-block btn-secondary modal-trigger">
+                    <i class="left material-icons">edit</i>Editar Nota
+                </a>
+                {% else %}
+                <a href="#setNoteModal" class="btn btn-flat btn-block btn-secondary modal-trigger">
+                    <i class="left material-icons">note</i>Agregar Nota
+                </a>
+                {% endif %}
+            </div>
+            {% if not workday.note is none %}
+            <div class="col s12 m12 l12 white-text">
+                <div class="card background-2f border-radius-10 hoverable">
+                    <div class="card-content white-text">
+                        <div class="row no-margin">
+                            {{draw_note(workday.note.splitlines())}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div style="margin-top: 80px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('product.view_list', workday_token=workday.token)}}"> <i class="large material-icons white-text">add</i></a>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/libs/sort.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/workday/details.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/buttons.js') }}"></script>
+{% endblock %}
+
+{# macro-Tooltips #}
+{% macro tooltip_inv_cost(total) %}
+{{tooltip_for_total([
+    {"key_classes": "red-text", "key": "Costo", "value": total.original_cost},
+    {"key_classes": "red-text", "key": "Costo Extra", "value": total.original_extra_cost},
+    {"key_classes": "orange-text", "key": "Gastos Generales", "value": total.spendings.general_spending},
+], {'value': total.cost}, left="$", title="Inversión")}}
+{% endmacro %}
+
+{% macro tooltip_general_spendings(total) %}
+{% set data_general = [] %}{% for spending in workday.get_spendings() %}{% if spending.id_profile is none %}
+{% set _ = data_general.append({"key": spending.get_name(), "value": spending.price}) %}{% endif %}{% endfor %}
+{{tooltip_for_total(data_general, {'value': total.spendings.general_spending}, left="$", title="Gastos Generales")}}
+
+{% endmacro %}
+
+{% macro tooltip_profile_spendings(profile, data, total) %}
+{% set data_profiles = [] %}{% for spending in workday.get_spendings() %}{% if spending.id_profile == profile.id %}
+{% set _ = data_profiles.append({"key": spending.get_name(), "value": spending.price}) %}{% endif %}{% endfor %}
+{{tooltip_for_total(data_profiles, {'value': data.spending}, left="$", title="Gastos de "+profile.get_name())}}
+{% endmacro %}

@@ -1,0 +1,16 @@
+{% extends "template-base.html" %}
+
+{% block head_title %}
+    Error {% block error_code %}404{% endblock error_code %} - {% block title_description %}Not Found{% endblock title_description %}
+{% endblock head_title %}
+
+{% block body_end %}
+<input
+        action="action"
+        onclick="window.history.go(-1); return false;"
+        type="submit"
+        value="Volver"
+        class="btn-input btn-back"
+        id="btn-error-back"
+/>
+{% endblock body_end %}

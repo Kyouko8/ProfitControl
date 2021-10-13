@@ -1,0 +1,145 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/index.css') }}">
+{%endblock%}
+
+{% block title %}Inicio{%endblock%}
+
+{% block nav_options_outside %} {# No muestra las opciones #} {% endblock %}
+
+{% block content %}
+<section>
+    <div class="container-fluid">
+
+        <div class="slider" id="mobile_fullscreen">
+            <ul class="slides">
+                <li>
+                    <img src="{{ url_for('static', filename='img/public/index/banner1.jpg') }}"> <!-- random image -->
+                    <div class="caption left-align">
+                        <h3>PROFIT CONTROL</h3>
+                        <h5 class="light grey-text text-lighten-3">¡Controla tu rendimiento de la manera más eficaz!</h5>
+                        <br>
+                        <div class="row no-margin no-padding">
+                            <div class="col l2 s12 no-padding">
+                                <a href="{{ url_for('auth.signup') }}" class="btn border-radius-5 btn-start-now">Registrarse Ahora</a>
+                            </div>
+
+                            <div class="col l1 s12 no-padding left-align">
+                                <a href="#!" class="btn btn-flat white-text no-btn">- O -</a>
+                            </div>
+                            
+                            <div class="col l2 s12 left-align no-padding">
+                                <a href="{{ url_for('auth.login') }}" class="btn btn-flat white-text">iniciar sesión</a>
+                            </div>
+
+                            <div class="col s12 hide-on-large-only btn-know-more center-align" id="btn-know-more">
+                                <a href="#know-more" class="btn white-text">
+                                    <i class="material-icons left">arrow_downward</i>
+                                    Concer Más
+                                    <i class="material-icons right">arrow_downward</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+       
+    </div>
+
+    <div class="relleno">
+
+    </div>
+
+    <div class="container" id="know-more">
+
+        <div class="row">
+
+            <div class="col l3 m6 s12">
+
+                <div class="card background-2f border-radius-5">
+                    <div class="card-image">
+                        <img src="{{ url_for('static', filename='img/public/index/icons/products.jpg') }}">
+                        
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Productos</span>
+                        <p>I am a very simple card. I am good at containing small bits of information.
+                            I am convenient because I require little markup to use effectively.</p>
+                    </div>
+                    <div class="card-action">
+                        <a href="#">This is a link</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col l3 m6 s12">
+
+                <div class="card background-2f border-radius-5">
+                    <div class="card-image">
+                        <img src="{{ url_for('static', filename='img/public/index/icons/clients.jpg') }}">
+                        
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Clientes</span>
+                        <p>I am a very simple card. I am good at containing small bits of information.
+                            I am convenient because I require little markup to use effectively.</p>
+                    </div>
+                    <div class="card-action">
+                        <a href="#">This is a link</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col l3 m6 s12">
+
+                <div class="card background-2f border-radius-5">
+                    <div class="card-image">
+                        <img src="{{ url_for('static', filename='img/public/index/icons/statistics.jpg') }}">
+                        
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Estadísticas</span>
+                        <p>I am a very simple card. I am good at containing small bits of information.
+                            I am convenient because I require little markup to use effectively.</p>
+                    </div>
+                    <div class="card-action">
+                        <a href="#">This is a link</a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col l3 m6 s12">
+
+                <div class="card background-2f border-radius-5">
+                    <div class="card-image">
+                        <img src="{{ url_for('static', filename='img/public/index/icons/money_profit.jpg') }}">
+                        
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">Ganancias</span>
+                        <p>I am a very simple card. I am good at containing small bits of information.
+                            I am convenient because I require little markup to use effectively.</p>
+                    </div>
+                    <div class="card-action">
+                        <a href="#">This is a link</a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/public/index.js') }}"></script>
+{% endblock %}

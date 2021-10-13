@@ -1,0 +1,98 @@
+{% extends "template-base.html" %}
+
+{#
+    current_user.username -> Nombre de usuario
+#}
+
+{% block head_title %}
+    Inicio
+{% endblock head_title %}
+
+{% block title %}
+    <h1>Control de Ganancias</h1>
+{% endblock title %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/index.css') }}">
+
+    <div>
+        <div class="row">
+            <!-- Productos -->
+            <div class="col s12 m12 l6">
+                <div class="card">
+                    <div class="card-content border-radius-10">
+                        <span class="card-title">Productos</span>
+                        <div class="row">
+                            <div class="col s12 m12 l6">
+                                <a href="{{ url_for('admin.product_add')}}" class="btn btn-block btn-flat">
+                                    Agregar</a>{# Función para agregar un nuevo producto #}
+                            </div>
+                            <div class="col s12 m12 l6">
+                                <a href="{{ url_for('admin.product_list')}}" class="btn btn-block btn-flat">
+                                    Listar</a> {# Función para ver la lista de productos #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Días de Trabajo -->
+            <div class="col s12 m12 l6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Días de Trabajo</span>
+                        <div class="row">
+                            <div class="col s12 m12 l6">
+                                <a href="{{ url_for('admin.workday_add')}}" class="btn btn-block btn-flat">
+                                    Agregar</a>{# Función para agregar un nuevo día laboral #}
+                            </div>
+                            <div class="col s12 m12 l6">
+                                <a href="{{ url_for('admin.workday_list')}}" class="btn btn-block btn-flat">
+                                    Listar</a> {# Función para ver la lista de días laborales #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+        
+        <div class="row">
+            <!-- Perfiles -->
+            <div class="col s12 m12 l6">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Perfiles</span>
+                        <div class="row">
+                            <div class="col s12 m12 l6">
+                                <a href="{{ url_for('admin.profile_add')}}" class="btn btn-block btn-flat">
+                                    Agregar</a> {# Función para agregar un nuevo perfil #}
+                            </div>
+                            <div class="col s12 m12 l6">
+                                <a href="{{ url_for('admin.profile_list')}}" class="btn btn-block btn-flat">
+                                    Listar</a> {# Función para ver la lista de perfiles #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Herramientas -->
+            <div class="col s12 m12 l6" class="btn btn-block">
+                <div class="card">
+                    <div class="card-content">
+                        <span class="card-title">Herramientas</span>
+                        <div class="row">
+                            <div class="col s12 m12">
+                                <a href="{{ url_for('admin.product_tools_nice_price')}}" class="btn btn-block btn-flat">
+                                    Calculo de Precio de Venta y Ganancias</a>{# Herramienta para calcular el precio #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}

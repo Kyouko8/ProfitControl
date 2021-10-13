@@ -1,0 +1,288 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import draw_note, tooltip_percent, tooltip_for_total with context %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/workday/details.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %}Detalles del Cliente - {{client.get_name()}}{%endblock%}
+
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('client.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Add from list #}
+<li><a href="{{url_for('client.list_sales', token=client.token)}}"><i class="left material-icons">store</i>Ventas</a></li>
+{# Normal Add #}
+<li><a href="{{url_for('client.resume', token=client.token)}}"><i class="left material-icons">info</i>Resumen</a></li>
+{# Spendings #}
+<li><a href="{{url_for('spending.view_list', workday_token=client.token)}}"><i class="left material-icons">payments</i>Pagos</a></li>
+{# Edit date #}
+<li><a href="{{url_for('client.add', token=client.token)}}"><i class="left material-icons">edit</i>Editar</a></li>
+{# Delete #}
+<li class="divider divider-option-buttons"></li>
+<li><a data-url="{{url_for('client.discard', token=client.token)}}" class="nav-btn-delete btn-delete {% if not client.can_be_deleted() %}disabled{% endif %}"><i class="left material-icons">delete</i>Descartar</a></li>
+{% endblock nav_options %}
+
+
+{% block content %}
+{% set f = int %}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('client.view_list')}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">arrow_back</i>Volver
+            </a>
+        </div>
+        
+        {# Edit date #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('client.add', token=client.token)}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">edit</i>Editar
+            </a>
+        </div>
+
+        {# Delete #}
+        <div class="col l4 m4 s12">
+            <a data-url="{{url_for('client.discard', token=client.token)}}" class="btn btn-block btn-cancel btn-delete {% if not client.can_be_deleted() %}disabled{% endif %} margin-bottom-10"><i
+                    class="left material-icons">delete</i>Descartar</a>
+        </div>
+        
+        {# Add from list #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('client.list_sales', token=client.token)}}" class="btn btn-block truncate">
+                <i class="left material-icons">store</i>Ventas
+            </a>
+        </div>
+        {# Normal Add #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('client.resume', token=client.token)}}" class="btn btn-block truncate">
+                <i class="left material-icons">info</i>Resumen
+            </a>
+        </div>
+        {# Spendings #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('spending.view_list', workday_token=client.token)}}" class="btn btn-block truncate">
+                <i class="left material-icons">payments</i>Pagos
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="container">
+
+    <div class="row no-margin">
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Información del Cliente</h1>
+        </div>
+    </div>
+
+    <div class="row no-display">
+        {# Add from list #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('client.list_sales', token=client.token)}}" class="btn btn-block btn-secondary truncate">
+                <i class="left material-icons">store</i>Ventas
+            </a>
+        </div>
+        {# Normal Add #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('client.resume', token=client.token)}}" class="btn btn-block btn-secondary truncate">
+                <i class="left material-icons">info</i>Resumen
+            </a>
+        </div>
+        {# Spendings #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('spending.view_list', workday_token=client.token)}}" class="btn btn-block btn-secondary truncate">
+                <i class="left material-icons">payments</i>Pagos
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- VENTAS -->
+<section>
+    <div class="container">
+
+        <!-- EDIT NOTE SYSTEM -->
+        <div class="modal background-2f border-radius-10" id="setNoteModal">
+            <form method="post" action="{{url_for('client.set_note', token=client.token, **request.args)}}">
+                {{ form.hidden_tag() }}
+
+                <div class="modal-content">
+                    <!-- FORM -->
+                    <div class="row">
+                        <div class="col l12 m12 s12">
+                            <h1 class="h1-size white-text uppercase-font">Editar nota</h1>
+                        </div>
+
+                        <!-- NOTE -->
+                        <div class="input-field col l12 m12 s12">
+                            {{ form.note.label }}
+                            {{ form.note(class="materialize-textarea white-text", rows=6, maxlength=2048) }} <br />
+                            {% for error in form.note.errors %}
+                            <span class="text-red">{{ error }}</span>
+                            {% endfor %}
+                        </div> 
+                    </div>                           
+                </div>
+
+                <div class="modal-footer grey darken-4">
+                    <!-- FORM SUBMITS BUTTONS -->
+                    <div class="row center no-margin-bottom">                   
+                        <div class="col l6 m6 s6 center-align">
+                            <a href="#!" class="modal-close btn btn-cancel btn-flat">Cancelar</a>
+                        </div>
+                        <div class="col l6 m6 s6 center-align">
+                            {{ form.submit(class="btn btn-save btn-flat") }}
+                        </div>                    
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="row">
+            <div class="col l12 m12 s12">
+                <div class="card background-2f border-radius-10 hoverable">
+                    <div class="card-content white-text">
+                        <span class="card-title">{{client.get_name()}}</span>
+
+                        {% if client.has_any_property() %}
+                        <div class="row no-margin">
+                            {% if client.description %}
+                            <div class="col l12 m12 s12">
+                                <p class="bold-font">Descripción: <span class="right normal-font">{{client.description or ""}}</span></p>
+                            </div>
+                            <div class="divider divider-custom"></div>
+                            {% endif %}
+                            
+                            {% if client.email %}
+                            <div class="col l12 m12 s12">
+                                <p class="bold-font">Correo electrónico: <span class="right normal-font"><a href="mailto:{{client.email}}">{{client.email}}</a></span></p>
+                            </div>
+                            <div class="divider divider-custom"></div>
+                            {% endif %}
+
+                            {% if client.telephone or client.phone_number %}
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Celular: <span class="right normal-font">{{client.phone_number or ""}}</span></p>
+                            </div>
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Teléfono: <span class="right normal-font">{{client.telephone or ""}}</span></p>
+                            </div>
+                            <div class="divider divider-custom"></div>
+                            {% endif %}
+
+                            {% if client.telephone_alt or client.phone_number_alt %}
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Celular (Alt.): <span class="right normal-font">{{client.phone_number_alt or ""}}</span></p>
+                            </div>
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Teléfono (Alt.): <span class="right normal-font">{{client.telephone_alt or ""}}</span></p>
+                            </div>
+                            <div class="divider divider-custom"></div>
+                            {% endif %}
+
+                            {% if client.address or client.location %}
+                            <div class="col l12 m12 s12">
+                                <p class="bold-font">Dirección: <span class="right normal-font">{{client.address or ""}}</span></p>
+                            </div>
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                            <div class="col l12 m12 s12">
+                                <p class="bold-font">Localidad: <span class="right normal-font">{{client.location or ""}}</span></p>
+                            </div>
+                            <div class="divider divider-custom"></div>
+                            {% endif %}
+                            
+                        </div>
+                        {% else %}
+                        <div class="row no-margin">
+                            <div class="col l12 m12 s12">
+                                <p><em>No hay información guardada sobre {{client.get_name()}}.</em></p>
+                            </div>
+                            <div class="divider divider-custom"></div>
+
+                            <div class="col l12 m12 s12">
+                                <p><em>Agregue la información pulsando el siguiente botón.</em></p>
+                            </div>
+                            <div class="divider divider-custom"></div>
+                            
+                            <div class="col l12 m12 s12">
+                                <a href="{{url_for('client.add', token=client.token, fields=True)}}" class="btn btn-secondary">Editar Información</a>
+                            </div>
+                            <div class="divider divider-custom"></div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+<!-- NOTE -->
+<section id="s-note">
+    <div class="container">
+        <div class="row">
+            <div class="col l12 m12 s12">
+                <h2 class="h2-size white-text uppercase-font">Nota del Día</h2>
+            </div>
+
+            <div class="col l4 m6 s12 left-align">
+                {% if not client.note is none %}
+                <a href="#setNoteModal" class="btn btn-flat btn-block btn-secondary modal-trigger">
+                    <i class="left material-icons">edit</i>Editar Nota
+                </a>
+                {% else %}
+                <a href="#setNoteModal" class="btn btn-flat btn-block btn-secondary modal-trigger">
+                    <i class="left material-icons">note</i>Agregar Nota
+                </a>
+                {% endif %}
+            </div>
+            {% if not client.note is none %}
+            <div class="col s12 m12 l12 white-text">
+                <div class="card background-2f border-radius-10 hoverable">
+                    <div class="card-content white-text">
+                        <div class="row no-margin">
+                            {{draw_note(client.note.splitlines())}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div style="margin-top: 80px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('client.add', token=client.token, fields=True)}}"> <i class="large material-icons white-text edit-fab-button">edit</i></a>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/libs/buttons.js') }}"></script>
+{% endblock %}
+

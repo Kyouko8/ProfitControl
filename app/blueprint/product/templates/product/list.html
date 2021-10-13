@@ -1,0 +1,692 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/product/list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %}Lista de Productos{%endblock%}
+{% set url_params = {'compare_token': compare_token, 'workday_token': workday_token, 'shoppingday_token': shoppingday_token, 'client_token': client_token} %}
+
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+{# Compare options #}
+{% if not compare_token is none %}
+    <li><a href="{{url_for('product.details', token=compare_token)}}" class="nav-back-button"><i class="material-icons">close</i></a></li>
+
+{# Workday options #}
+{% elif not workday_token is none %}
+    <li><a href="{{url_for('workday.details', token=workday_token)}}" class="nav-back-button"><i class="material-icons">close</i></a></li>
+
+{# ShoppingDay options #}
+{% elif not shoppingday_token is none %}
+    <li><a href="{{url_for('shoppingday.details', token=shoppingday_token)}}" class="nav-back-button"><i class="material-icons">close</i></a></li>
+
+{# Client options #}
+{% elif not client_token is none %}
+    <li><a href="{{url_for('client.details', token=client_token)}}" class="nav-back-button"><i class="material-icons">close</i></a></li>
+
+{# Products options #}
+{% else %}
+    <li><a href="{{url_for('public.home')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+
+{% endif %}
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Compare options #}
+{% if not compare_token is none %}
+
+{# Workday options #}
+{% elif not workday_token is none %}
+    {# Add #}
+    <li><a href="{{url_for('product.add', workday_token=workday_token)}}"><i class="material-icons">playlist_add</i>Agregar Nuevo</a></li>
+
+{# ShoppingDay options #}
+{% elif not shoppingday_token is none %}
+    {# Add #}
+    <li><a href="{{url_for('product.add', shoppingday_token=shoppingday_token)}}"><i class="left material-icons">playlist_add</i>Agregar Nuevo</a></li>
+
+{# Client options #}
+{% elif not client_token is none %}
+    {# Add #}
+    <li><a href="{{url_for('product.add', client_token=client_token)}}"><i class="left material-icons">playlist_add</i>Agregar Nuevo</a></li>
+    
+{# Products options #}
+{% else %}
+    {# Add #}
+    <li><a href="{{url_for('product.add')}}"><i class="left material-icons">playlist_add</i>Agregar Nuevo</a></li>
+    {# Resume #}
+    <li><a href="{{url_for('product.list_details')}}"><i class="left material-icons">assessment</i>Ver resumen</a></li>
+{%endif%}
+
+{# Otras opciones #}
+<li class="divider divider-option-buttons"></li>
+{# Products: Show/Hide #}
+{% set args = request.args.copy() %}
+{% set _ = args.pop('show_all', None) %}
+{% set _ = args.update(url_params) %}
+{% if show_all %}
+<li><a href="{{url_for('product.view_list', show_all='false', **args,)}}">
+    <i class="material-icons">visibility_off</i>Ocultar Productos</a></li>
+{% else %}
+<li><a href="{{url_for('product.view_list', show_all='true', **args)}}">
+    <i class="material-icons">visibility</i>Mostrar Productos</a></li>
+{% endif %}
+
+{# Warnings: Show/Hide #}
+{% if compare_token is none and workday_token is none and shoppingday_token is none%}
+{% set args = request.args.copy() %}
+{% set _ = args.pop('warnings', None) %}
+{% if warnings %}
+<li><a href="{{url_for('product.view_list', warnings='false', **args)}}">
+    <i class="material-icons">report_off</i>Ocultar Advertencias</a></li>
+{% else %}
+<li><a href="{{url_for('product.view_list', warnings='true', **args)}}">
+    <i class="material-icons">report</i>Mostrar Advertencias</a></li>
+{% endif %}
+{% endif %}
+{% endblock nav_options %}
+
+{% block nav_options_buttons %}
+<!--Search Button -->
+{% if search %}
+<li><a href="{{url_for('product.view_list', show_all=show_all, **url_params)}}"><i class="material-icons">search_off</i></a></li>
+{% else %}
+<li><a id="search-nav-button-alt" class="modal-trigger" href="#searchModal"><i class="material-icons right">search</i></a></li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- OPTION BUTTONS -->
+<section>
+    <div class="container">
+        <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+            {# Compare options #}
+            {% if not compare_token is none %}
+            {# Cancel #}
+            <div class="col l12 m12 s12 left-align">
+                <a href="{{url_for('product.details', token=compare_token)}}" class="btn btn-block btn-cancel">Cancelar</a>
+            </div>
+
+            {# Workday options #}
+            {% elif not workday_token is none %}
+                {# Back #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('workday.details', token=workday_token)}}" class="btn btn-block"><i class="left material-icons">arrow_back</i>Volver</a>
+                </div>
+
+                {# Add #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('product.add', workday_token=workday_token)}}" class="btn btn-block"><i class="left material-icons">playlist_add</i>Agregar Nuevo</a>
+                </div>
+
+            {# ShoppingDay options #}
+            {% elif not shoppingday_token is none %}
+                {# Back #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('shoppingday.details', token=shoppingday_token)}}" class="btn btn-block"><i class="left material-icons">arrow_back</i>Volver</a>
+                </div>
+
+                {# Add #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('product.add', shoppingday_token=shoppingday_token)}}" class="btn btn-block"><i class="left material-icons">playlist_add</i>Agregar Nuevo</a>
+                </div>
+
+            {# Client options #}
+            {% elif not client_token is none %}
+                {# Back #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('client.details', token=client_token)}}" class="btn btn-block"><i class="left material-icons">arrow_back</i>Volver</a>
+                </div>
+
+                {# Add #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('product.add', client_token=client_token)}}" class="btn btn-block"><i class="left material-icons">playlist_add</i>Agregar Nuevo</a>
+                </div>
+                
+            {# Products options #}
+            {% else %}
+                {# Back #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('public.home')}}" class="btn btn-block"><i class="left material-icons">arrow_back</i>Volver</a>
+                </div>
+
+                {# Add #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('product.add')}}" class="btn btn-block"><i class="left material-icons">playlist_add</i>Agregar</a>
+                </div>
+                
+                {# Resume #}
+                <div class="col l4 m4 s12">
+                    <a href="{{url_for('product.list_details')}}" class="btn btn-block"><i class="left material-icons">assessment</i>Ver resumen</a>
+                </div>
+            {%endif%}
+        </div>
+    </div>
+</section>
+
+        
+<section>
+    <div class="container white-text">
+        <!-- SEARCH SYSTEM -->
+        <div class="modal background-2f border-radius-10" id="searchModal">
+            <form method="post" action="{{url_for('product.list_search', **url_params)}}">
+                {{ form.hidden_tag() }}
+
+                <div class="modal-content">
+                    <!-- FORM -->
+                    <div class="row">
+                        <div class="col l12 m12 s12">
+                            <h1 class="h1-size white-text uppercase-font">Buscar productos
+                                <a href="#!" class="white-text btn btn-flat btn-block btn-secondary right tooltipped" id="btnSearchAdvanced"
+                                    data-position="bottom" data-tooltip="Mostrar/Ocultar opciones avanzadas">
+                                    <i class="material-icons">{% if search_data.advanced %}expand_less{% else %}expand_more{% endif %}</i>
+                                </a>
+                            </h1>
+                        </div>
+                        <!-- NAME -->
+                        <div class="input-field col l6 m6 s12">
+                            {{ form.name.label }}
+                            {{ form.name(value=request.args.get("name", ""))}} <br />
+                            {% for error in form.name.errors %}
+                            <span style="color:red;">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+        
+                        <!-- MIN PRICE -->
+                        <div class="input-field col l3 m3 s12">
+                            {{ form.min_price.label }}
+                            {{ form.min_price(value=request.args.get("min_price", "")) }} <br />
+                            {% for error in form.min_price.errors %}
+                            <span style="color:red;">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- MAX PRICE -->
+                        <div class="input-field col l3 m3 s12">
+                            {{ form.max_price.label }}
+                            {{ form.max_price(value=request.args.get("max_price", "")) }} <br />
+                            {% for error in form.max_price.errors %}
+                            <span style="color:red;">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Advanced Options -->
+                        <div class="{% if not search_data.advanced %}no-display{% endif %}" id="search-advanced">
+                            <!-- MIN COST -->
+                            <div class="input-field col l3 m3 s12">
+                                {{ form.min_cost.label }}
+                                {{ form.min_cost(value=request.args.get("min_cost", "")) }} <br />
+                                {% for error in form.min_cost.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MAX COST -->
+                            <div class="input-field col l3 m3 s12">
+                                {{ form.max_cost.label }}
+                                {{ form.max_cost(value=request.args.get("max_cost", "")) }} <br />
+                                {% for error in form.max_cost.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MIN PROFIT -->
+                            <div class="input-field col l3 m3 s12">
+                                {{ form.min_profit.label }}
+                                {{ form.min_profit(value=request.args.get("min_profit", "")) }} <br />
+                                {% for error in form.min_profit.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MAX PROFIT -->
+                            <div class="input-field col l3 m3 s12">
+                                {{ form.max_profit.label }}
+                                {{ form.max_profit(value=request.args.get("max_profit", "")) }} <br />
+                                {% for error in form.max_profit.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MIN STOCK -->
+                            <div class="input-field col l3 m3 s12">
+                                {{ form.min_stock.label }}
+                                {{ form.min_stock(value=request.args.get("min_stock", "")) }} <br />
+                                {% for error in form.min_stock.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MAX STOCK -->
+                            <div class="input-field col l3 m3 s12">
+                                {{ form.max_stock.label }}
+                                {{ form.max_stock(value=request.args.get("max_stock", "")) }} <br />
+                                {% for error in form.max_stock.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MIN SALES -->
+                            <div class="input-field col l3 m3 s12">
+                                {{ form.min_sales.label }}
+                                {{ form.min_sales(value=request.args.get("min_sales", "")) }} <br />
+                                {% for error in form.min_sales.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MAX SALES -->
+                            <div class="input-field col l3 m3 s12">
+                                {{ form.max_sales.label }}
+                                {{ form.max_sales(value=request.args.get("max_sales", "")) }} <br />
+                                {% for error in form.max_sales.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>                           
+                </div>
+
+                <div class="modal-footer grey darken-4">
+                    <!-- FORM SUBMITS BUTTONS -->
+                    <div class="row center no-margin-bottom">                   
+                        <div class="col l4 m4 s6 center-align">
+                            <a href="#!" class="modal-close btn btn-cancel btn-flat">Cancelar</a>
+                        </div>
+                        <div class="col l4 m4 s6 center-align">
+                            {{ form.submit(class="btn btn-save btn-flat") }}
+                        </div>
+                        <div class="col l4 m4 s12 center-align hide-on-small-only">
+                            <a href="{{url_for('product.view_list', show_all='true', search='true', **url_params)}}" class="btn btn-secondary btn-flat">Ver Todos</a>
+                        </div>                  
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <!-- PRODUCT LIST -->
+        <div class="row">
+            <div class="col l12 m12 s12">
+                <p class="hide-on-med-and-down">&nbsp;<br></p>
+                <div class="row no-margin">
+                    <div class="col l8 m12 s12 margin-top-20">
+                        <h1 class="h1-size white-text uppercase-font no-margin">Lista de Productos</h1>
+                    </div>
+
+                    <div class="col l4 m12 s12 margin-top-20 hide-on-med-and-down">
+                        <a href="#searchModal" class="waves-effect waves-light btn btn-flat btn-secondary modal-trigger right margin-left-5 tooltipped"
+                            data-position="bottom" data-tooltip="Buscar">
+                            <i class="material-icons">search</i></a>
+
+                        {% if search %}
+                        <a href="{{url_for('product.view_list', show_all=show_all, **url_params)}}"
+                            class="waves-effect waves-light btn btn-flat btn-secondary modal-trigger right margin-left-5 tooltipped"
+                            data-position="bottom" data-tooltip="Finalizar búsqueda">
+                            <i class="material-icons">close</i></a>
+                        {% endif %}
+
+                        {% set args = request.args.copy() %}
+                        {% set _ = args.pop('show_all', None) %}
+                        {% set _ = args.update(url_params) %}
+                        {% if show_all %}
+                        <a href="{{url_for('product.view_list', show_all='false', **args,)}}"
+                            class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-5 tooltipped"
+                            data-position="bottom" data-tooltip="Ocultar productos sin stock">
+                            <i class="material-icons">visibility_off</i></a>
+                        {% else %}
+                        <a href="{{url_for('product.view_list', show_all='true', **args)}}"
+                            class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-5 tooltipped"
+                            data-position="bottom" data-tooltip="Mostrar todos los productos">
+                            <i class="material-icons">visibility</i></a>
+                        {% endif %}
+
+                        {% if compare_token is none and workday_token is none and shoppingday_token is none and client_token is none%}
+                        {% set args = request.args.copy() %}
+                        {% set _ = args.pop('warnings', None) %}
+                        {% if warnings %}
+                        <a href="{{url_for('product.view_list', warnings='false', **args)}}"
+                            class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-5 tooltipped"
+                            data-position="bottom" data-tooltip="Ocultar advertencias de <b>precio</b> y <b>stock</b> en los productos">
+                            <i class="material-icons">report_off</i></a>
+                        {% else %}
+                        <a href="{{url_for('product.view_list', warnings='true', **args)}}"
+                            class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-5 tooltipped"
+                            data-position="bottom" data-tooltip="Mostrar advertencias de <b>precio</b> y <b>stock</b> en los productos">
+                            <i class="material-icons">report</i></a>
+                        {% endif %}
+                        {% endif %}
+                            
+                    </div>
+                </div>
+                    
+                    
+                {% if (not workday_token is none) or (not client_token is none) %}
+                <p class="grey-text">Seleccione el producto que vendió. Escriba una parte del nombre del artículo en el cuadro de búsqueda para localizarlo rápidamente.</p>
+                {% elif not shoppingday_token is none %}
+                <p class="grey-text">Seleccione el producto que desea comprar. Escriba una parte del nombre del artículo en el cuadro de búsqueda para localizarlo rápidamente.</p>
+                {% endif %}
+
+                {% if search %}
+                <p class="grey-text">Resultados de la búsqueda: <span id="searchNumberInfo">{{search_data.results}}</span> / {{search_data.total}} coincidencias</p>
+                {% endif %}
+            </div>
+
+            <div class="col l12 m12 s12">
+                {{generatePageNumbers(url_params)}}
+                <!-- FastSearch -->
+                <div class="{% if not (search or show_search) %}no-display{% endif %}">
+                    <div class="card background-2f border-radius-10">
+                        <div class="card-content">
+                            <div class="row no-margin">
+                                <div class="col s9 m10 l11">
+                                    <input  class="white-text" type="text" id="fast_search_input" placeholder="Búsqueda rápida">
+                                </div>
+                                <div class="col s2 m1 l1">
+                                    <a href="#!" class="btn btn-flat btn-secondary center tooltipped" id="fast_search_mode" data-mode="all" data-position="bottom" data-tooltip="Buscar en todos">
+                                        <i class="tiny material-icons white-text center">filter_9_plus</i>    
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content hoverable">
+    
+                        <table id="sorted_table" class="table-hoverable">
+                            <thead> 
+                                <tr class="grey-text">
+                                    <th data-type="name">Nombre <i class="material-icons tiny">arrow_drop_up</i></th>
+                                    <th data-type="stock" class="center col-stock">Stock <i class="material-icons tiny"></i></th>
+                                    <th data-type="price" class="center col-price">Precio <i class="material-icons tiny"></i></th> 
+                                    <th data-type="price" class="center col-cost hide-on-small-only">Costo <i class="material-icons tiny"></i></th> {# dont show on mobile #}
+                                    <th data-type="price" class="center col-profit hide-on-1080-and-down">Ganancia <i class="material-icons tiny"></i></th> {# dont show on mobile, tablets #}
+                                    <th data-type="number" class="center col-sell hide-on-1270-and-down">Ventas <i class="material-icons tiny"></i></th> {# dont show on mobile, tablets #}
+                                    <th data-type="name" class="center col-condition hide-on-1270-and-down">Estado <i class="material-icons tiny"></i></th> {# dont show on mobile, tablets #}
+        
+                                    {% if compare_token is none and workday_token is none and shoppingday_token is none and client_token is none%}
+                                    <th class="center hide-on-med-and-down"><i class="material-icons tiny"></i> Opciones</th>
+                                    {%endif%}
+                                </tr>
+                                
+                            </thead>
+                            
+                            <tbody>
+                                {% for product in products %}
+        
+                                    {% set stock = product.get_stock() %}
+                                    {% set cost = product.get_current_cost() %}
+        
+                                    {% if (stock and product.active) or (show_all) %}
+                                        {% set tr_color = "yellow" if not product.active else "red" if not stock else "white"  %}
+                                        <tr class="{{ tr_color }}-text lighten-3 hoverable2">
+                                            <!-- nombre -->
+                                            <td>
+                                                {% set a_color = "white-text" %}
+                                                {% set tooltip = product.get_name()+"<br>" %}
+                                                {% set warning_number = 0 %}
+                                                {# WorkDay #}
+                                                {% if not workday_token is none %}
+                                                    {% set href = url_for('workday.product_add', token=workday_token, product_token=product.token) %}
+                                                
+                                                {# ShoppingDay #}
+                                                {% elif not shoppingday_token is none %}
+                                                    {% set href = url_for('shoppingday.product_add', token=shoppingday_token, product_token=product.token) %}
+                                                
+                                                {# Client #}
+                                                {% elif not client_token is none %}
+                                                    {% set href = url_for('client.product_add', token=client_token, product_token=product.token) %}
+                                            
+                                                {# Product #}
+                                                {% elif compare_token is none %}
+                                                    {% set href = url_for('product.details', token=product.token) %}
+                                                    {% if warnings %}
+                                                        {% set out = product.is_in_price_tooltip(
+                                                            '<i class="material-icons orange-text tiny">warning</i> <b class="orange-text">Advertencia</b>') %}
+                                                        {% set tooltip = tooltip + out[0] %}
+                                                        {% set a_color = out[1] %}
+                                                        {% if not product.is_in_price() %}
+                                                            {% set warning_number = warning_number + 1 %}
+                                                        {% endif %}
+
+                                                        {% if stock >= 1 and stock <= 5 and product.new %}
+                                                            {% set tooltip = (tooltip + '<br><i class="material-icons orange-text tiny">warning</i> <b class="orange-text">Advertencia</b>: Stock bajo')%}
+                                                            {% set a_color = "orange-text" %} 
+                                                            {% set warning_number = warning_number + 1 %}
+                                                        {% else %}
+                                                        {% if stock == 0 %}
+                                                            {% set tooltip = (tooltip + '<br><i class="material-icons red-text tiny">error</i> <b class="red-text">Advertencia</b>: No hay stock.') %}
+                                                            {% set a_color = "red-text" %}
+                                                            {% set warning_number = warning_number + 1 %}
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    {% endif %}
+                                                {# Compare #}
+                                                {% else %}
+                                                    {% if compare_token == product.token %}
+                                                        {% set href = "#!" %}
+                                                        {% set a_color = "grey-text darken-2" %}
+                                                        {% set tooltip = "Producto actual." %}
+                                                    {% else %}
+                                                        {% set href = url_for('product.compare', token1=compare_token, token2=product.token)%}
+                                                    {% endif %} 
+                                                {% endif %}
+
+                                                <a href="{{ href }}" class="{{ a_color }} btn-open-in-new row-title {% if tooltip and warnings %}tooltipped{% endif %}"
+                                                    data-position="bottom" data-tooltip="{{tooltip}}">
+                                                    <i class="tiny left material-icons hide-on-med-and-down">open_in_new</i>
+                                                    {{product.get_name()}} {% if not product.active %}<span class="grey-text">[inactivo]</span>{% endif %}
+                                                    {% if warnings and warning_number >= 1 %}<span class="badge {{a_color}} text-darken-4">[{{warning_number}}]</span>{% endif %}    
+                                                </a>
+                                            </td>
+
+                                            <!-- stock -->
+                                            <td class="center {% if not stock %}red-text lighten-3{%endif%}" id="product_stock_{{product.token}}">
+                                                <button class="waves-effect waves-light btn-small btn-flat white-text btn-modify-stock btn-remove-stock hide-on-small-only {% if not stock or stock <= 0%}disabled{% endif %}" data-token="{{product.token}}" data-mode="remove">
+                                                    <i class="tiny material-icons">remove</i>
+                                                </button>
+                                                
+                                                <span class="stock">
+                                                    {% if stock %} {{stock}} {%else%} 0 {%endif%}
+                                                </span>
+                                                
+                                                <button class="waves-effect waves-light btn-small btn-flat white-text btn-modify-stock hide-on-small-only" data-token="{{product.token}}" data-mode="add">
+                                                    <i class="tiny material-icons">add</i>
+                                                </button>
+                                            </td>
+
+                                            <!-- precio -->
+                                            <td class="center blue-text darken-2">${{cost.get_price()}}</td>
+                                            <!-- cost -->
+                                            <td class="center hide-on-small-only red-text darken-4">${{cost.get_real_cost()}}</td> {# dont show on desktop #}
+                                            <!-- ganancia -->
+                                            <td class="center hide-on-1080-and-down green-text darken-4">${{product.get_gain(cost=cost)}}</td> {# dont show on desktop #}
+                                            <!-- venidos -->
+                                            <td class="center hide-on-1270-and-down amber-text darken-4">{{product.get_sales_count()}}</td> {# dont show on desktop #}
+                                            <!-- estado -->
+                                            <td class="center hide-on-1270-and-down">{{'Nuevo' if product.new else 'Usado'}}</td> {# dont show on desktop #}
+        
+                                            {% if compare_token is none and workday_token is none and shoppingday_token is none %}
+                                            <!-- opciones -->
+                                            <td class="center row-options hide-on-med-and-down">
+                                                <div class="row no-margin">
+                                                    <div class="col {% if product.can_be_deleted() %} l6 {%else%} l12 {%endif%} m12 s12">
+                                                        <a href="{{url_for('product.add', token=product.token)}}" class="btn btn-flat btn-block btn-edit">
+                                                            <i class="tiny material-icons center">edit</i>
+                                                        </a>
+                                                    </div>
+                                                    <div class="col l6 m12 s12">
+                                                        {% if product.can_be_deleted() %}
+                                                        <a data-url="{{url_for('product.discard', token=product.token)}}" class="btn btn-flat btn-block btn-delete">
+                                                            <i class="tiny material-icons center">delete</i>
+                                                        </a>
+                                                        {%endif%}
+                                                    </div>                                                    
+                                                    
+                                                </div>
+
+                                            </td> {# dont show on mobile, tablets #}
+                                            {%endif%}
+                                        </tr>
+                                    {% endif %}
+        
+                                {%endfor%}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+                {{generatePageNumbers(url_params)}}
+
+            </div>
+
+        </div>
+    </div>
+
+    <!--<div class="fixed-action-btn hide-on-large-only" id="options_fixed_action_btn">
+        <a class="btn-floating transparent">
+            <i class="large material-icons">tune</i>
+        </a>
+        <ul>
+            <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+            <li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li>
+            <li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+            <li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li>
+        </ul>
+    </div>-->
+    
+    <div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+        <div class="fixed-action-btn">
+            {# Compare options #}
+            {% if not compare_token is none %}
+            {# Workday options #}
+            {% elif not workday_token is none %}
+            <a class="btn-floating blue btn-large" href="{{url_for('product.add', workday_token=workday_token)}}"> <i class="large material-icons white-text">add</i></a>
+            {# ShoppingDay options #}
+            {% elif not shoppingday_token is none %}
+            <a class="btn-floating blue btn-large" href="{{url_for('product.add', shoppingday_token=shoppingday_token)}}"> <i class="large material-icons white-text">add</i></a>
+            {# Client options #}
+            {% elif not client_token is none %}
+            <a class="btn-floating blue btn-large" href="{{url_for('product.add', client_token=client_token)}}"> <i class="large material-icons white-text">add</i></a>
+            {# Products options #}
+            {% else %}
+            <a class="btn-floating blue btn-large" href="{{url_for('product.add')}}"> <i class="large material-icons white-text">add</i></a>
+            {% endif %}
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/libs/sort.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/product/list.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/buttons.js') }}"></script>
+{% endblock %}
+
+
+{% macro generatePageNumbers(url_params) %}
+{% set url_args = {'show_all': show_all} %}
+{% set _ = url_args.update(url_params) %}
+{% if page_max >= 2 %}
+    <ul class="pagination">
+        {% if page > 1 %}
+            <li class="waves-effect">
+                <a href="{{url_for('product.view_list', page=page-1, **url_args)}}">
+                    <i class="material-icons">chevron_left</i>
+                </a>
+            </li>
+
+            {% if page >= 7 %}
+            <li class="waves-effect">
+                <a href="{{url_for('product.view_list', page=1, **url_args)}}">
+                    1
+                </a>
+            </li>
+            {% if page-5 < 2 %}
+            <li class="waves-effect">
+                <a href="{{url_for('product.view_list', page=2, **url_args)}}">
+                    2
+                </a>
+            </li>
+            {% else %}
+            {% if page-5 >= 3 %}
+            <li class="disabled"><a href="#!">...</a></li>
+            {% endif %}
+            {% endif %}
+            {% endif %}
+
+        {% else %}
+            <li class="disabled">
+                <a href="#!">
+                    <i class="material-icons">chevron_left</i>
+                </a>
+            </li>
+        {% endif %}
+
+        {% for page_number in range(max(page-5, 1), min(page+5, page_max+1))%}
+            {% if page == page_number %}
+                <li class="active blue">
+                    <a href="#!">{{ page_number }}</a>
+                </li>
+            {% else %}
+                <li class="waves-effect">
+                    <a href="{{url_for('product.view_list', page=page_number, **url_args)}}">{{ page_number }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < page_max %}
+            {% if min(page+6, page_max+1) <= page_max %}
+            {% if page+6 == page_max %}
+            <li class="waves-effect">
+                <a href="{{url_for('product.view_list', page=page_max-1, **url_args)}}">
+                    {{ page_max-1 }}
+                </a>
+            </li>
+            {% else %}
+            <li class="disabled"><a href="#!">...</a></li>
+            {% endif %}
+            
+            <li class="waves-effect">
+                <a href="{{url_for('product.view_list', page=page_max, **url_args)}}">
+                    {{ page_max }}
+                </a>
+            </li>
+            {% endif %}
+
+            {% if (page+5 == page_max) %}
+            <li class="waves-effect">
+                <a href="{{url_for('product.view_list', page=page_max, **url_args)}}">
+                    {{ page_max }}
+                </a>
+            </li>
+            {% endif %}
+
+            <li class="waves-effect">
+                <a href="{{url_for('product.view_list', page=page+1, **url_args)}}">
+                    <i class="material-icons">chevron_right</i>
+                </a>
+            </li>
+        {% else %}
+            <li class="disabled">
+                <a href="#!">
+                    <i class="material-icons">chevron_right</i>
+                </a>
+            </li>
+        {% endif %}
+
+    </ul>
+{% endif %}
+{% endmacro %}

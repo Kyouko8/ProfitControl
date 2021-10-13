@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+
+{% set actual_url = request.url_rule.endpoint%}
+{% if not actual_url %}
+{% set actual_url = ""%}
+{% endif %}
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+	<meta name="author" content="Mendez Luca & Medina Dylan">
+	<meta name="copyright" content="Medina Dylan">
+	{% block meta %}
+	{% endblock %}
+
+
+	<!-- Icon -->
+	<!-- Original Icon: URL -> https://thenounproject.com/term/increase-cost/-->
+	<link rel="icon" href="{{url_for('static', filename='img/icon_v3.png')}}">
+
+	{% if offline %}
+	<!-- WARNING: This libs are load from local server -->
+	<!-- offline mode: 'true' -->
+
+	<!-- Google Icon Font -->
+	<link href="{{url_for('static', filename='offline/css/material_icon_v95.css')}}" rel="stylesheet">
+
+	<!-- Roboto Font -->
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="{{url_for('static', filename='offline/css/roboto.css')}}" rel="stylesheet">
+
+	<!-- Materialize CSS -->
+	<link rel="stylesheet" href="{{url_for('static', filename='offline/css/materialize_v100.min.css')}}">
+	
+	{% else %}
+	<!-- Google Icon Font -->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+	<!-- Roboto Font -->
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+
+	<!-- Materialize CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+	{% endif %}
+
+	{% block cdncss %}
+	{% endblock %}
+
+	<!-- Custom CSS -->
+	{% block css %}
+	{% endblock %}
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/buttons.css') }}">
+
+	{% if offline %}
+	<!-- Jquery -->
+	<script src="{{url_for('static', filename='offline/js/jquery351.min.js')}}"></script>
+
+	{% else %}
+	<!-- Jquery -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+	{% endif %}
+	<title>{%block title%}{%endblock%} - Profit Control</title>
+</head>
+
+<body class="background-12">
+
+	{% with messages = get_flashed_messages(with_categories=true) %} {% if messages %} {% for category, message in messages %} {% if message %}
+	<article id="flash-alert">
+		<div class="flash-alert {% if category == 'error' %}background-error{% elif category == 'success' %}background-success{%endif%}">
+			<i class="right material-icons white-text" style="padding: 5px; cursor: pointer;" id="closeFlash">close</i>
+			{% if category == 'error' %}
+			<div class="error-message center-align">
+				<h5>{{message}}</h5>
+			</div>
+	
+			{% elif category == 'success' %}
+			<div class="success-message center-align">
+				<h5 class="white-text">{{message}}</h5>
+			</div>
+
+			{% else %}
+			<div class="center-align">
+				<h5 class="white-text">{{message}}</h5>
+			</div>
+			{%endif%}
+		</div>
+	</article>
+	{% endif %} {% endfor %} {% endif %} {% endwith %}
+	
+	<noscript>
+		<article id="flash-alert">
+			<div class="flash-alert" style="background-color: #CF6679;">
+				<div class="error-message center-align">
+					<h5 class="white-text">Debes habilitar Javascript para utilizar esta página.</h5>
+				</div>
+			</div>
+		</article>
+	</noscript>
+
+	<main>
+
+		{% if not request.url_rule.endpoint in (
+			"public.home", "public.about", "product.add", "workday.add",
+			"notes.add", "profile.add", "spending.add", "workday.stat",
+			"product.tools_nice_price", "product.compare", "product.list_details",
+			"auth.login", "auth.signup", "public.index") %}
+		<section>
+			<!-- Modal Structure -->
+			<div id="modal_delete_item" class="modal background-2f border-radius-10 white-text">
+				<div class="modal-content">
+					<p class="h1-size uppercase-font center-align no-margin-top red-text text-lighten-1">¡Atención!</p>
+					<p>Está a punto de <span class="red-text text-lighten-1 uppercase-font">eliminar</span> un elemento. Esta opción <strong>no</strong> se puede deshacer y el elemento, junto con toda su información actual, será <strong>irrecuperable</strong>.</p>
+					<p class="center-align h2-size no-margin-bottom">¿Desea continuar?</p>
+				</div>
+
+				<div class="modal-footer grey darken-4">
+					<div class="row no-margin center">
+						<div class="col s6">
+							<a href="#!" class="modal-close waves-effect waves-green btn btn-flat btn-cancel">No, cancelar</a>
+						</div>
+						<div class="col s6">
+							<a href="#!" class="modal-close waves-effect waves-green btn btn-flat btn-save" id="btn_modal_delete">Sí, eliminar</a>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+		</section>
+		{% endif %}
+		<header>
+			{% if current_user.is_authenticated %}
+			<ul id="nav_tools_dropdown" class="dropdown-content background-2f border-bottom-radius-5">
+				{% set endpoints = [
+					("Buen Precio", "price_check", "product.tools_nice_price", {}),
+					("Notas", "description", "note.view_list", {})
+				] %}
+
+				{% for _name, _icon, _route, _params in endpoints %}
+					{% set _active = "active" if request.url_rule.endpoint == _route else "" %}
+					{% set _route = url_for(_route, **_params) if request.url_rule.endpoint != _route else "#!"%}
+					<li class="{{ _active }}">
+						<a href="{{ _route }}" class="white-text"><i class="left material-icons">{{_icon}}</i>{{ _name }}</a>
+					</li>
+				{% endfor %}
+			</ul>
+
+			<ul id="nav_sections_dropdown" class="dropdown-content background-2f border-bottom-radius-5">
+				{% set endpoints = [
+					("Productos", "list", "product.view_list", {}),
+					("Clientes", "group", "#!", {}),
+					("Días de Trabajo", "date_range", "workday.view_list", {}),
+					("Días de Compra", "date_range", "shoppingday.view_list", {})
+				] %}
+
+				{% for _name, _icon, _route, _params in endpoints %}
+					{% set _active = "active" if request.url_rule.endpoint == _route else "" %}
+					{% if _route != "#!" %}
+						{% set _route = url_for(_route, **_params) if request.url_rule.endpoint != _route else "#!"%}
+					{% endif %}
+					<li class="{{ _active }}">
+						<a href="{{ _route }}" class="white-text"><i class="left material-icons">{{_icon}}</i>{{ _name }}</a>
+					</li>
+				{% endfor %}
+			</ul>
+
+			<ul id="nav_profile_dropdown" class="dropdown-content background-2f border-bottom-radius-5">
+				{% set endpoints = [
+					("Mi Perfil", "account_circle", "admin.user_details", {}),
+					("Perfiles", "people", "profile.view_list", {}),
+					("Configuración", "settings", "admin.user_settings", {})
+				] %}
+
+				{% for _name, _icon, _route, _params in endpoints %}
+					{% set _active = "active" if request.url_rule.endpoint == _route else "" %}
+					{% set _route = url_for(_route, **_params) if request.url_rule.endpoint != _route else "#!"%}
+					<li class="{{ _active }}">
+						<a href="{{ _route }}" class="white-text"><i class="left material-icons">{{_icon}}</i>{{ _name }}</a>
+					</li>
+				{% endfor %}
+			</ul>
+			
+			<ul id="nav_options" class="dropdown-content background-2f border-bottom-radius-5">
+				{% block nav_options %}
+				{% endblock nav_options %}
+			</ul>				
+			{% endif %}		
+			
+			{% set _sidenav = {'active': 0} %}
+			<div class="navbar-fixed">
+				<nav>
+					<div class="nav-wrapper background-2f">
+		
+						{# "Profit" sería la traducción correcta, no "gain" #}
+						<a href="{{url_for('public.index')}}" class="brand-logo center brand-logo-custom">Profit Control</a>
+
+						{% block sidenav_button %}<a href="#" data-target="sidenav" class="sidenav-trigger"><i class="material-icons">menu</i></a>{% set _ = _sidenav.update({'active': 1}) %}{% endblock %}
+
+						{% if current_user.is_authenticated %}
+						<ul class="left hide-on-med-and-down">
+							<li class="{% if request.url_rule.endpoint == 'public.home' %}active{%endif%}">
+								<a href="{{ url_for('public.home') if not (request.url_rule.endpoint == 'public.home') else '#!'}}">
+									<i class="left material-icons">home</i>Inicio
+								</a>
+							</li>	
+
+							<li><a class="dropdown-trigger" href="#!" data-target="nav_tools_dropdown">Herramientas<i class="material-icons right">arrow_drop_down</i></a></li>
+							<li><a class="dropdown-trigger" href="#!" data-target="nav_sections_dropdown">Secciones<i class="material-icons right">arrow_drop_down</i></a></li>
+						</ul>
+						{% endif %}
+
+						<ul class="right hide-on-med-and-down">
+							{% if not current_user.is_authenticated %}
+							<li {% if request.url_rule.endpoint == 'auth.login' %}class="active"{% endif %}><a href="{{url_for('auth.login')}}">Iniciar Sesión</a></li>
+							<li {% if request.url_rule.endpoint == 'auth.signup' %}class="active"{% endif %}><a href="{{url_for('auth.signup')}}">Registrarse</a></li>
+							{% else %}
+							<li><a class="dropdown-trigger" href="#!" data-target="nav_profile_dropdown">{{current_user.username}}<i class="material-icons right">arrow_drop_down</i></a></li>
+							<!-- <li {% if request.url_rule.endpoint == 'admin.user_details' %}class="active"{% endif %}><a href="{{url_for('admin.user_details')}}"><i class="material-icons right">person</i>{{current_user.username}}</a></li> -->
+							{# <li><a href="{{url_for('auth.logout')}}"><i class="material-icons right">logout</i>Cerrar Sesión</a></li> #}
+							{% endif %}
+						</ul>
+
+						{% block nav_options_outside %}
+						{% if current_user.is_authenticated %}<ul class="right hide-on-large-only" id="nav_options_parent">
+							{% block nav_options_buttons %}{% endblock %}
+							<li><a id="fast-search-nav-button" {% block search_nav_button%}class="no-display"{% endblock %}><i class="material-icons right">search</i></a></li>
+							<li><a class="dropdown-trigger" href="#!" data-target="nav_options"><i class="material-icons right">more_vert</i></a></li>
+						</ul>{% endif %}
+						{% endblock nav_options_outside %}
+					</div>
+				</nav>
+			</div>
+
+			{% if _sidenav.active %}
+			<ul class="sidenav" id="sidenav">
+				<li class="center-align bold-font uppercase-font white-text h3-size">Profit Control</li>
+				<div class="divider"></div>
+				{% if not current_user.is_authenticated %}
+				<li><a href="{{url_for('auth.login')}}"><i class="left material-icons">login</i> Iniciar Sesión</a></li>
+				<li><a href="{{url_for('auth.signup')}}"><i class="left material-icons">app_registration</i> Registrarse</a></li>
+				{% else %}	
+				<!-- USUARIO -->
+				<li>
+					<a href="{{url_for('admin.user_details') if not request.url_rule.endpoint == 'admin.user_details' else '#!'}}">{{ current_user.username }}</a>
+				</li>
+				
+				<!-- PRINCIPAL -->
+				<div class="divider"></div>
+				<li {% if request.url_rule.endpoint == 'public.home' %}class="active"{% endif %}>
+					<a href="{{url_for('public.home') if not request.url_rule.endpoint == 'public.home' else '#!'}}"><i class="left material-icons">home</i> Inicio</a>
+				</li>
+				
+				<!-- SECCIONES ->
+				<div class="divider"></div>
+				{% set endpoints = [
+					("Productos", "list", "product.view_list", {}),
+					("Clientes", "group", "#!", {}),
+					("Días de Trabajo", "date_range", "workday.view_list", {}),
+					("Días de Compra", "date_range", "shoppingday.view_list", {})
+				] %}
+
+				{% for _name, _icon, _route, _params in endpoints %}
+					{% set _active = "active" if request.url_rule.endpoint == _route else "" %}
+					{% if _route != "#!" %}
+						{% set _route = url_for(_route, **_params) if request.url_rule.endpoint != _route else "#!"%}
+					{% endif %}
+					<li class="{{ _active }}">
+						<a href="{{ _route }}" class="white-text"><i class="left material-icons">{{_icon}}</i>{{ _name }}</a>
+					</li>
+				{% endfor %}
+				
+				<!- HERRAMIENTAS ->
+				<div class="divider"></div>
+				{% set endpoints = [
+					("Buen Precio", "price_check", "product.tools_nice_price", {}),
+					("Notas", "description", "note.view_list", {})
+				] %}
+
+				{% for _name, _icon, _route, _params in endpoints %}
+					{% set _active = "active" if request.url_rule.endpoint == _route else "" %}
+					{% set _route = url_for(_route, **_params) if request.url_rule.endpoint != _route else "#!"%}
+					<li class="{{ _active }}">
+						<a href="{{ _route }}" class="white-text"><i class="left material-icons">{{_icon}}</i>{{ _name }}</a>
+					</li>
+				{% endfor %} -->
+
+				<!-- AJUSTES -->
+				<div class="divider"></div>
+				{% set endpoints = [
+					("Mi Perfil", "account_circle", "admin.user_details", {}),
+					("Configuración", "settings", "admin.user_settings", {})
+				] %}
+
+				{% for _name, _icon, _route, _params in endpoints %}
+					{% set _active = "active" if request.url_rule.endpoint == _route else "" %}
+					{% set _route = url_for(_route, **_params) if request.url_rule.endpoint != _route else "#!"%}
+					<li class="{{ _active }}">
+						<a href="{{ _route }}" class="white-text"><i class="left material-icons">{{_icon}}</i>{{ _name }}</a>
+					</li>
+				{% endfor %}
+
+				<!-- CERRAR SESIÓN -->
+				<div class="divider"></div>
+				<li><a href="{{url_for('auth.logout')}}">Cerrar Sesión <i class="left material-icons">logout</i></a></li>
+				{% endif %}
+			</ul>  
+			{% endif %}          
+		</header>
+
+		{%block content%}
+		{%endblock%}
+	</main>
+
+	
+	{% if offline %}
+	<!-- WARNING: OFFLINE MODE "true" -->
+	<!--JavaScript at end of body for optimized loading-->
+	<script src="{{url_for('static', filename='offline/js/materializecss100.min.js')}}"></script>
+	{% else %}
+	<!--JavaScript at end of body for optimized loading-->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+	{% endif %}
+
+	{% block cdnjs %}
+	{%endblock%}
+
+	<script src="{{ url_for('static', filename='js/initialize.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/layout.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/libs/buttons.js') }}"></script>
+	{% block javascript %}
+	{%endblock%}
+</body>
+
+</html>

@@ -1,0 +1,237 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/product/add.css') }}">
+{%endblock%}
+
+
+{% block title %}Copia de Seguridad{%endblock%}
+
+{% block content %}
+
+<section>
+
+    <div class="container-fluid  {% if finish %} no-display {% endif %}">
+        <div class="row">
+            <div class="col s12">
+                <h1 class="h1-size white-text uppercase-font ">Copia de Seguridad</h1>
+                <p class="grey-text">Seleccione un archivo PROFIT-JSON o JSON para cargar los productos y añadirlos a su lista actual.</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col l9 m12 s12">
+                <div class="card background-2f border-radius-10">
+
+                    <form method="post" enctype="multipart/form-data">
+                        {{ form.hidden_tag() }}
+
+                        <div class="card-content">
+                            <!-- FORM -->
+                            <div class="row">
+                                <!-- UPLOAD FILE -->
+                                <div class="col l12 m12 s12">
+                                    <div class="file-field input-field">
+                                        <div class="btn btn-flat btn-secondary right">
+                                            <span>Seleccionar</span>
+                                            <input type="file" name="upload_file" id="upload_file">
+                                        </div>
+                                        <div class="file-path-wrapper">
+                                            <input class="file-path validate" type="text">
+                                        </div>
+                                    </div>
+
+                                    {% for error in form.upload_file.errors %}
+                                    <span class="msg-error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                    
+                                <!-- CONDITION -->
+                                <div class="col l12 m12 s12 margin-bottom-10">
+                                    <label for="new" class="uppercase-font">Si ya existe el producto:</label>
+                                    {% for item in form.if_exists.choices %}
+                                    <p>
+                                        <label>
+                                            <input id="if_exists{{ item[0] }}" name="if_exists" type="radio" class="with-gap" value="{{ item[0] }}" {% if form.if_exists.data == item[0] %}checked="checked" {% endif %}>
+                                            <span>{{ item[1] }}</span>
+                                        </label>
+                                    </p>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- Customize Price -->
+                                <div class="" id="customize_if_exists">
+                                    <!-- UPDATE-PRICE -->
+                                    <div class="col l6 m12 s12 margin-bottom-10" >
+                                        <label for="new" class="uppercase-font">Actualizar Precio:</label>
+                                        {% for item in form.update.choices %}
+                                        <p>
+                                            <label>
+                                                <input id="update{{ item[0] }}" name="update" type="radio" class="with-gap" value="{{ item[0] }}" {% if form.update.data == item[0] %}checked="checked" {% endif %}>
+                                                <span>{{ item[1] }}</span>
+                                            </label>
+                                        </p>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- UPDATE-STOCK -->
+                                    <div class="col l6 m12 s12 margin-bottom-10">
+                                        <label for="new" class="uppercase-font">Actualizar Stock:</label>
+                                        {% for item in form.stock.choices %}
+                                        <p>
+                                            <label>
+                                                <input id="stock{{ item[0] }}" name="stock" type="radio" class="with-gap" value="{{ item[0] }}" {% if form.stock.data == item[0] %}checked="checked" {% endif %}>
+                                                <span>{{ item[1] }}</span>
+                                            </label>
+                                        </p>
+                                        {% endfor %}
+                                    </div>
+
+                                    <!-- UPDATE-NAME -->
+                                    <div class="col l6 m12 s12 margin-bottom-10">
+                                        <label for="new" class="uppercase-font">Modificar Nombre:</label>
+                                        {% for item in form.update_name.choices %}
+                                        <p>
+                                            <label>
+                                                <input id="update_name{{ item[0] }}" name="update_name" type="radio" class="with-gap" value="{{ item[0] }}" {% if form.update_name.data == item[0] %}checked="checked" {% endif %}>
+                                                <span>{{ item[1] }}</span>
+                                            </label>
+                                        </p>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+
+                        <div class="card-action">
+                            <!-- FORM SUBMITS BUTTONS -->
+                            <div class="row center no-margin-bottom">
+                                <div class="col l6 m6 s6" id="btn-cancel">
+                                    <a href="{{url_for('product.list_details')}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                </div>
+                    
+                                <div class="col l6 m6 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin") }}
+                                </div>                                
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+
+            <div class="col l3 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+
+                    <div class="card-content grey-text info-card" id="card_help">
+                        <span class="card-title uppercase-font center">Ayuda</span>
+                        <p>
+                            <strong>Pasos para Importar Copia:</strong>
+                            <br>
+                            &#9679; Seleccione un archivo JSON o PROFIT-JSON.
+                            <br>
+                            &#9679; Seleccione qué se debe hacer cuando un producto ya existe.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Cuando se encuentren productos ya existentes:</strong>
+                            <br>
+                            &#9679; <b>No hacer nada</b>: No realizará cambios en productos existentes.
+                            <br>
+                            &#9679; <b>Personalizar</b>: Permite decidir qué hacer si el producto ya existe.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Actualizar Precio:</strong>
+                            <br>
+                            &#9679; Seleccione que propiedades del producto deben ser actualizadas.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Actualizar Stock:</strong>
+                            <br>
+                            &#9679; Seleccione como debe procesarse el <b>Stock</b> de los productos. 
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Modificar Nombre:</strong>
+                            <br>
+                            &#9679; Seleccione si desea modificar el nombre de los productos al importarlos. Esto con el fin de evitar modificaciones a productos existentes.
+                        </p>
+                        <hr>
+                        <p>Si lo que usted desea es descargar una copia, utilice el siguiente enlace.</p><br>
+                
+                        <a href="{{url_for('download.json_products')}}" class="btn btn-secondary"><i
+                            class="left material-icons">file_download</i>Descargar Copia</a>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="hide-on-large-only">
+                <div class="fixed-action-btn">
+                    <a class="btn-floating btn-large" href="#card_help">
+                        <i class="large material-icons blue-text">help_outline</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid  {% if not finish %} no-display {% endif %}">
+        <div class="row">
+            <div class="col s12">
+                <h1 class="h1-size white-text uppercase-font ">Copia de Seguridad</h1>
+                <p class="grey-text">Se ha cargado una copia de seguridad con éxito.</p>
+            </div>
+
+            <div class="col l12 m12 s12">
+                <div class="card background-2f border-radius-10 white-text">
+                    <div class="card-content">
+                        <div class="row">
+                            <div class="col l12 m12 s12">
+                                <h2>Información:</h2>
+                                <p><span class="green-text">{{products_status.ok}}</span> productos cargados correctamente</p>
+                                <p><span class="red-text">{{products_status.errors}}</span> productos con error.</p>
+                            </div>
+
+                            <div class="col l12 m12 s12">
+                                <h2>Cargados correctamente:</h2>
+                            
+                                <table class="highlight">
+                                    {% for product in products_status.ok_ls %}
+                                    <tr>
+                                        <td>
+                                            {{product.get_name()}}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col l6 m6 s6">
+                <a href="{{url_for('product.view_list')}}" class="btn btn-secondary"><i
+                    class="left material-icons">arrow_back</i>Volver</a>
+            </div>
+
+            <div class="col l6 m6 s6">
+                <a href="{{url_for('download.upload_backup_products')}}" class="btn btn-secondary right"><i
+                    class="left material-icons">arrow_forward</i>Continuar</a>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/upload/json.js') }}"></script>
+{% endblock %}

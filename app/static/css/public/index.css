@@ -1,0 +1,107 @@
+/* NAVBAR */
+nav, .navbar-fixed {
+    display: none !important;
+    height: 0px !important;
+}
+
+/* SLIDER SECTION */
+.slider .slides img{
+    filter: brightness(40%);
+}
+
+.slider .slides h3{
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.slider .slides h5{
+    font-weight: 400;
+}
+
+.buttons-wrapper {
+    position: absolute;
+    height: calc(100vh);
+    display: flex;
+    padding-top: calc(55vh);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    top: 0;
+    pointer-events: none;
+    width: 100%;
+}
+
+.buttons-wrapper .row{
+    width: 100%;
+}
+
+.buttons-wrapper a {
+    pointer-events: auto;
+}
+
+.btn-slider{
+    border: 1px solid #ffffff;
+    transition: .3s;
+    color: #ffffff;
+}
+
+.btn-slider:hover{
+    background-color: #4caf50;
+    color: white;
+    transition: .3s;
+}
+
+.btn-slider.btn-slider-client:hover{
+    background-color: #4caf50;
+}
+
+.btn-slider.btn-slider-store:hover{
+    background-color: #03a9f4;
+}
+
+.btn-start-now{
+    background-color: #4caf50 !important;
+}
+
+.btn.btn-flat:hover{
+    background: none !important;
+    color: lightskyblue !important;
+    transition: 0.3s;
+}
+
+/* .btn-know-more{
+    position: absolute !important;
+    top: 130%;
+} */
+
+.btn-know-more .btn{
+    background-color: #2196f3;
+    border-radius: 5px;
+}
+
+.no-btn,
+.btn.no-btn:hover{
+    cursor: default;
+    color: white !important;
+}
+
+/* INFO CARDS */
+.card{
+    color: white;
+}
+.card-title{
+    font-weight: 500 !important;
+}
+
+
+/* RELLENO */
+.relleno{
+    height: 100vh;
+}
+
+@media screen and (min-width: 992px){
+    .relleno{
+        height: 2em;
+    }
+}

@@ -1,0 +1,39 @@
+/* BUTTONS */
+.btn-floating{
+    border: 1px solid #2196f3;
+    background: none;
+}
+
+.btn-floating:hover,
+.btn-floating:active{
+    background-color: transparent;
+    color: white;
+    transition: .3s;
+}
+
+.btn-floating:active .material-icons{
+    color: white;
+    background: none;
+}
+
+.option-buttons{
+    margin-top: 1em;
+    margin-bottom: 0;
+    transition: .3s;
+    max-width: 1280px;
+}
+
+
+.option-buttons .btn{
+    border-radius: 5px;
+    background: none;
+    border: 1px solid #2196f3;
+    color:  white;
+    height: auto;
+}
+
+.option-buttons .btn:hover{
+    background: #2196f3;
+    color: white;
+}
+

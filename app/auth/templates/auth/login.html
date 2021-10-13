@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% block title%} Iniciar Sesión {% endblock %}
+
+{% block css%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth/form.css') }}">
+{% endblock %}
+
+{% block content %}
+
+<section>
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col l3 m12 s12"></div>
+
+            <div class="col l6 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+                    <form method="post">
+                        <div class="card-content">
+                            <span class="card-title white-text uppercase-font center">Iniciar Sesión</span>
+                            
+                            {{form.hidden_tag()}}
+
+                            {% if not user_data is none %}
+                            <p class="white-text">Elegiste iniciar sesión como <strong>{{user_data.username}}</strong>, introduce tu contraseña.</p><br>
+                            <input id="email" type="hidden" name="email" value="{{user_data.email}}" required>
+                            
+                            <div class="input-field">
+                                <input id="email_dis" type="email" class="validate input {{invalid_email}}" name="email_dis" value="{{user_data.email}}" disabled>
+                                <label for="email_dis" class="label grey-text">Correo Electrónico</label>
+                                {% for error in form.email.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="input-field">
+                                <input id="email" type="email" class="validate input {{invalid_email}}" name="email" required>
+                                <label for="email" class="label">Correo Electrónico</label>
+                                {% for error in form.email.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                
+                            <div class="input-field">
+                                <input id="password" type="password" class="validate input {{invalid_email}}" name="password" required>
+                                <label for="password" class="label">Contraseña</label>
+                                <p class="no-margin no-padding left-align field-icon"><i class="material-icons password-visibility white-text" data-target="password">visibility</i></p>
+                                {% for error in form.password.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}
+                            </div>
+                
+                            <p>
+                                <label>
+                                    <input id="remember_me" type="checkbox" class="filled-in" checked="checked" name="remember_me"  />
+                                    <span>Mantener Sesión Iniciada</span>
+                                </label>
+                            </p><br> 
+                            <p>
+                                <label>
+                                    <input id="fast_log" type="checkbox" class="filled-in" checked="checked" name="fast_log"  />
+                                    <span>Mantener mi Usuario en Recientes</span>
+                                </label>
+                            </p> 
+
+                        </div>
+
+                        <div class="card-action center-align">
+                            <button type="submit" id="submit" name="submit" class="btn btn-save">iniciar sesión</button>
+                            
+                            <p class="grey-text">¿No tienes una cuenta? <a href="{{url_for('auth.signup', **request.args)}}" class="blue-text text-darken-2">Registrate</a></p>
+                        </div>
+                    </form>
+
+
+                </div>
+
+            </div>
+
+            <div class="col l3 m12 s12"></div>
+
+        </div>
+
+        {% if len(user_list) >= 1 %}
+        <div class="row">
+            <div class="col s12 m12 l6 push-l3">
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+                        <span class="card-title white-text uppercase-font center">Usuarios Recientes</span>
+                        {% for _user in user_list %}
+                            <a href="{{url_for('auth.login', user_token=_user.token)}}" class="btn btn-save btn-block margin-bottom-10 {% if user_data == _user %}disabled{% endif %}">{{_user.username}}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript%}
+{% endblock %}

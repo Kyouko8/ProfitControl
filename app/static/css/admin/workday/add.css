@@ -1,0 +1,13 @@
+/* DATEPICKER */
+.datepicker-date-display{
+    background-color: #151515;
+}
+
+.datepicker-container{
+    background: #2f2f2f !important;
+    color: white !important;
+}
+.datepicker-controls *{
+    color: white;
+}
+

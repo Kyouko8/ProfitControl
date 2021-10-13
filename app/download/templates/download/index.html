@@ -1,0 +1,23 @@
+{% extends "template-base.html" %}
+
+{% block head_title %}
+    Download Page: Index
+{% endblock head_title %}
+
+{% block title %}
+    <h1>Download Page: Index</h1>
+{% endblock title %}
+
+{% block content %}
+    <p>
+        Welcome to Download Page.
+    </p>
+    <p style="color:red;">
+        You shouldn't be viewing this page.
+        The Download section is for requests only, it has no content to view.
+    </p>
+    <p>
+        You can test our example of download.
+        <a href="{{url_for('download.dwn_file', filename='example.txt')}}">Clic here to download.</a>
+    </p>
+{% endblock content %}

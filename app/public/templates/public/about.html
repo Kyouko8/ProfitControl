@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/about.css') }}">
+{%endblock%}
+
+{% block title %}Acerca de...{%endblock%}
+
+{% block nav_options_outside %} {# No muestra las opciones #} {% endblock %}
+
+{% block content %}
+<section>
+    <div class="container white-text">
+        <div class="row">
+            <!-- Productos -->
+            <div class="col l12 m12 s12">
+
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+
+                        <span class="card-title center upparcase-font">Información de la Aplicación</span>
+
+                        <div class="row">
+                            <div class="col l12 m12 s12 left-align margin-bottom-10">
+                                <b>Profit Control:</b><br>
+                                * <b>Versión:</b> {{VERSION}}<br>
+                            </div>
+
+                            <div class="col l12 m12 s12 left-align margin-bottom-10">
+                                <b>Front-end:</b><br>
+                                * <b>Diseñador:</b> Luca Mendez<br>
+                            </div>
+
+                            <div class="col l12 m12 s12 left-align margin-bottom-10">    
+                                <b>Back-end:</b><br>
+                                * <b>Programador:</b> Medina Dylan<br>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}

@@ -1,0 +1,186 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/public/home.css') }}">
+{%endblock%}
+
+{% block title %}Inicio{%endblock%}
+
+{% block content %}
+<section>
+    <div class="container">
+        <div class="row">
+            <!-- Productos -->
+            <div class="col l6 m6 s12">
+
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+
+                        <span class="card-title center uppercase-font">Productos</span>
+
+                        <div class="row center">
+                            <div class="col l6 m12 s12">
+                                {# Función para agregar un nuevo producto #}
+                                <a href="{{ url_for('product.add')}}" class="btn btn-block btn-flat"><i class="left material-icons">playlist_add</i>Agregar</a>
+                            </div>
+
+                            <div class="col l6 m12 s12">
+                                {# Función para ver la lista de productos #}
+                                <a href="{{ url_for('product.view_list')}}" class="btn btn-block btn-flat"><i class="left material-icons">list</i>Listar</a> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clientes -->
+            <div class="col l6 m6 s12">
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+                        
+                        <span class="card-title center uppercase-font">Clientes</span>
+
+                        <div class="row center">
+                            <div class="col l6 m12 s12">
+                                {# Función para agregar un nuevo cliente #}
+                                <a href="{{ url_for('client.add')}}" class="btn btn-block btn-flat"><i class="left material-icons">person_add</i>Agregar</a>
+                            </div>
+
+                            <div class="col l6 m12 s12">
+                                {# Función para ver la lista de clientes #}
+                                <a href="{{ url_for('client.view_list')}}" class="btn btn-block btn-flat"><i class="left material-icons">group</i>Listar</a> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Días de Trabajo -->
+            <div class="col l6 m6 s12">
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+                        
+                        <span class="card-title center uppercase-font">Días de Trabajo</span>
+
+                        <div class="row center">
+                            <div class="col l6 m12 s12">
+                                {# Función para agregar un nuevo día laboral #}
+                                <a href="{{ url_for('workday.add')}}" class="btn btn-block btn-flat"><i class="left material-icons">today</i>Agregar</a>
+                            </div>
+
+                            <div class="col l6 m12 s12">
+                                {# Función para ver la lista de días laborales #}
+                                <a href="{{ url_for('workday.view_list')}}" class="btn btn-block btn-flat"><i class="left material-icons">date_range</i>Listar</a> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Día de Compra -->
+            <div class="col l6 m6 s12">
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+                        
+                        <span class="card-title center uppercase-font">Días de Compra</span>
+
+                        <div class="row center">
+                            <div class="col l6 m12 s12">
+                                {# Función para agregar un nuevo día de compra #}
+                                <a href="{{ url_for('shoppingday.add') }}" class="btn btn-block btn-flat"><i class="left material-icons">today</i>Agregar</a>
+                            </div>
+
+                            <div class="col l6 m12 s12">
+                                {# Función para ver la lista de días de compras #}
+                                <a href="{{ url_for('shoppingday.view_list') }}" class="btn btn-block btn-flat"><i class="left material-icons">date_range</i>Listar</a> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notas -->
+            <div class="col l6 m6 s12">
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+                        
+                        <span class="card-title center uppercase-font">Notas</span>
+
+                        <div class="row center">
+                            <div class="col l6 m12 s12">
+                                {# Función para agregar una nueva nota #}
+                                <a href="{{ url_for('note.add')}}" class="btn btn-block btn-flat"><i class="left material-icons">note_add</i>Agregar</a>
+                            </div>
+
+                            <div class="col l6 m12 s12">
+                                {# Función para ver la lista de notas #}
+                                <a href="{{ url_for('note.view_list')}}" class="btn btn-block btn-flat"><i class="left material-icons">description</i>Listar</a> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        
+            <!-- Perfiles -->
+            <div class="col l6 m6 s12">
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+
+                        <span class="card-title center uppercase-font">Perfiles</span>
+
+                        <div class="row center">
+                            <div class="col l6 m12 s12">
+                                <a href="{{ url_for('profile.add')}}" class="btn btn-block btn-flat"><i class="left material-icons">person_add</i>Agregar</a> {# Función para agregar un nuevo perfil #}
+                            </div>
+
+                            <div class="col l6 m12 s12">
+                                <a href="{{ url_for('profile.view_list')}}" class="btn btn-block btn-flat"><i class="left material-icons">person_search</i>Listar</a> {# Función para ver la lista de perfiles #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ayuda -->
+            <div class="col l6 m6 s12" class="btn">
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+
+                        <span class="card-title center uppercase-font">Ayuda</span>
+
+                        <div class="row center">
+                            <div class="col s12 m12 l6">
+                                <a href="{{url_for('public.about')}}" class="btn btn-block btn-flat"><i class="left material-icons">info</i>Acerca de</a>
+                            </div>
+                            <div class="col s12 m12 l6">
+                                <a href="#" class="btn btn-block btn-flat"><i class="left material-icons">help</i>Ayuda</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Herramientas -->
+            <div class="col l6 m6 s12" class="btn">
+                <div class="card border-radius-10 background-2f hoverable">
+                    <div class="card-content">
+
+                        <span class="card-title center uppercase-font">Herramientas</span>
+
+                        <div class="row center">
+                            <div class="col s12 m12 l12">
+                                <a href="{{ url_for('product.tools_nice_price')}}" class="btn btn-block btn-flat"><i class="left material-icons">price_check</i>Buen Precio</a>{# Herramienta para calcular el precio #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

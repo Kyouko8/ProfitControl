@@ -1,0 +1,259 @@
+{% extends 'layout.html' %}
+
+{% block css%}
+<link rel="stylesheet" href=" {{ url_for('static', filename='css/admin/workday/list.css') }} ">
+<link rel="stylesheet" href=" {{ url_for('static', filename='css/libs/list.css') }} ">
+{% endblock %}
+
+{% block title %} Lista de Días de Compras {% endblock title %}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('public.home')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Add #}
+<li><a href="{{url_for('shoppingday.add')}}"><i class="left material-icons">today</i>Agregar</a></li>
+{% endblock nav_options %}
+
+{% block nav_options_buttons %}
+<!--Search Button -->
+{% if search %}
+<li><a href="{{url_for('shoppingday.view_list')}}"><i class="material-icons">search_off</i></a></li>
+{% else %}
+<li><a id="search-nav-button-alt" class="modal-trigger" href="#searchModal"><i class="material-icons right">search</i></a></li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section>
+    <div class="container">
+        <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+            {# Back #}
+            <div class="col l4 m4 s12">
+                <a href="{{url_for('public.home')}}" class="btn btn-block"><i class="left material-icons">arrow_back</i>Volver</a>
+            </div>
+
+            {# Agregar #}
+            <div class="col l4 m4 s12">
+                <a href="{{url_for('shoppingday.add')}}" class="btn btn-block"><i class="left material-icons">today</i>Agregar</a>
+            </div>
+
+        </div>
+
+        
+        <!-- SEARCH SYSTEM -->
+        <div class="modal background-2f border-radius-10" id="searchModal">
+            <form method="post" action="{{url_for('shoppingday.list_search')}}">
+                {{ form.hidden_tag() }}
+
+                <div class="modal-content">
+                    <!-- FORM -->
+                    <div class="row">
+                        <div class="col l12 m12 s12">
+                            <h1 class="h1-size white-text uppercase-font">Buscar Días de Compras
+                                <a href="#!" class="white-text btn btn-flat btn-block btn-secondary right tooltipped" id="btnSearchAdvanced"
+                                    data-position="bottom" data-tooltip="Mostrar/Ocultar opciones avanzadas">
+                                    <i class="material-icons">{% if search_data.advanced %}expand_less{% else %}expand_more{% endif %}</i>
+                                </a>
+                            </h1>
+                        </div>
+
+                        <!-- MIN DATE -->
+                        <div class="input-field col l6 m6 s12">
+                            {{ form.min_date.label }}
+                            <input type="text" class="datepicker white-text" id="min_date" name="min_date" placeholder="Desde" value="{{ request.args.get('min_date', '') }}">
+                            <span class="helper-text grey-text">DD/MM/YYYY</span>
+                            {% for error in form.min_date.errors %}
+                            <span style="color:red;">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- MAX DATE -->
+                        <div class="input-field col l6 m6 s12">
+                            {{ form.max_date.label }}
+                            <input type="text" class="datepicker white-text" id="max_date" name="max_date" placeholder="Hasta" value="{{ request.args.get('max_date', '') }}">
+                            <span class="helper-text grey-text">DD/MM/YYYY</span>
+                            {% for error in form.max_date.errors %}
+                            <span style="color:red;">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Advanced Options -->
+                        <div class="{% if not search_data.advanced %}no-display{% endif %}" id="search-advanced">
+                            <!-- MIN PRICE -->
+                            <div class="input-field col l3 m6 s12">
+                                {{ form.min_price.label }}
+                                {{ form.min_price(value=request.args.get("min_price", "")) }} <br />
+                                {% for error in form.min_price.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MAX PRICE -->
+                            <div class="input-field col l3 m6 s12">
+                                {{ form.max_price.label }}
+                                {{ form.max_price(value=request.args.get("max_price", "")) }} <br />
+                                {% for error in form.max_price.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MIN SHOPPINGS -->
+                            <div class="input-field col l3 m6 s12">
+                                {{ form.min_shoppings.label }}
+                                {{ form.min_shoppings(value=request.args.get("min_shoppings", "")) }} <br />
+                                {% for error in form.min_shoppings.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <!-- MAX SHOPPINGS -->
+                            <div class="input-field col l3 m6 s12">
+                                {{ form.max_shoppings.label }}
+                                {{ form.max_shoppings(value=request.args.get("max_shoppings", "")) }} <br />
+                                {% for error in form.max_shoppings.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>                           
+                </div>
+
+                <div class="modal-footer grey darken-4">
+                    <!-- FORM SUBMITS BUTTONS -->
+                    <div class="row center no-margin-bottom">                   
+                        <div class="col l6 m6 s6 center-align">
+                            <a href="#!" class="modal-close btn btn-cancel btn-flat">Cancelar</a>
+                        </div>
+                        <div class="col l6 m6 s6 center-align">
+                            {{ form.submit(class="btn btn-save btn-flat") }}
+                        </div>                    
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Date List-->
+        <div class="row">
+
+            <div class="col l12 m12 s12">
+                <p class="hide-on-med-and-down">&nbsp;<br></p>
+
+                <div class="row">
+                    <div class="col l9 m12 s12  margin-top-20">
+                        <h1 class="h1-size white-text uppercase-font no-margin">Lista de Días de Compras</h1>
+                    </div>
+                    <div class="col l3 m3 s12  margin-top-20 hide-on-med-and-down">
+                        <a href="#searchModal" class="waves-effect waves-light btn btn-flat btn-secondary modal-trigger right margin-left-10 tooltipped"
+                            data-position="bottom" data-tooltip="Buscar">
+                            <i class="material-icons">search</i></a>
+
+                        {% if search %}
+                        <a href="{{url_for('shoppingday.view_list')}}" class="waves-effect waves-light btn btn-flat btn-secondary modal-trigger right margin-left-10 tooltipped"
+                            data-position="bottom" data-tooltip="Finalizar búsqueda">
+                            <i class="material-icons">close</i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if search %}
+                <p class="grey-text">Resultados de la búsqueda: <span id="searchNumberInfo">{{search_data.results}}</span> / {{search_data.total}} coincidencias</p>
+                {% endif %}
+            </div>
+
+            <div class="col l12 m12 s12">
+
+                <!-- FastSearch -->
+                <div class="{% if not search %}no-display{% endif %}">
+                    <div class="card background-2f border-radius-10">
+                        <div class="card-content">
+                            <div class="row no-margin">
+                                <div class="col s9 m10 l11">
+                                    <input  class="white-text" type="text" id="fast_search_input" placeholder="Búsqueda rápida">
+                                </div>
+                                <div class="col s2 m1 l1">
+                                    <a href="#!" class="btn btn-flat btn-secondary center tooltipped" id="fast_search_mode" data-mode="all" data-position="bottom" data-tooltip="Buscar en todos">
+                                        <i class="tiny material-icons white-text center">filter_9_plus</i>    
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+
+                        <table id="sorted_table">
+                            <thead> 
+                                <tr class="grey-text">
+                                    <th data-type="date">Fecha <i class="material-icons tiny">arrow_drop_up</i></th>
+                                    <th data-type="name" class="center hide-on-med-and-down">Día <i class="material-icons tiny"></i></th>
+                                    <th data-type="price" class="center">Monto <i class="material-icons tiny"></i></th>
+                                    <th data-type="number" class="center hide-on-med-and-down">Productos <i class="material-icons tiny"></i></th>
+                                    <th class="center hide-on-med-and-down">Opciones <i class="material-icons tiny"></i></th>
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                                {% for shoppingday in shoppingdays %}
+                                <tr class="white-text">
+
+                                    <td width="50%">
+                                        <a class="white-text btn-open-in-new" href="{{url_for('shoppingday.details', token=shoppingday.token, resume='true')}}">
+                                            <i class="tiny left material-icons hide-on-med-and-down">open_in_new</i>
+                                            {{shoppingday.get_format()}}
+                                        </a>
+                                    </td>
+                                    <td class="center hide-on-med-and-down">{{shoppingday.get_day_name()}}</td>
+                                    
+                                    {% set shoppings = shoppingday.get_mount_of_shoppings() %}
+                                    <td class="red-text center">${{shoppings.cost + shoppings.spendings}}</td>
+                                    <td class="yellow-text hide-on-med-and-down center">{{shoppings.quantity}}</td>
+                                    
+                                    <td class="row-options hide-on-med-and-down">
+                                        <div class="row no-margin">
+                                            <div class="col {% if shoppingday.can_be_deleted() %} l6 {%else%} l12 {%endif%} m12 s12">
+                                                <a href="{{url_for('shoppingday.add', token=shoppingday.token)}}" class="btn btn-flat btn-block btn-edit">
+                                                    <i class="tiny material-icons center">edit</i>
+                                                </a>
+                                            </div>
+                                            <div class="col l6 m12 s12">
+                                                {% if shoppingday.can_be_deleted() %}
+                                                <a data-url="{{url_for('shoppingday.discard', token=shoppingday.token)}}" class="btn btn-flat btn-delete">
+                                                    <i class="tiny material-icons center">delete</i>
+                                                </a>
+                                                {%endif%}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# DON'T DELETE !!!! #}
+<div style="height: 100px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('shoppingday.add')}}"> <i class="large material-icons white-text">add</i></a>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/libs/sort.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/workday/list.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/buttons.js') }}"></script>
+{% endblock %}

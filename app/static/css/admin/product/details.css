@@ -1,0 +1,21 @@
+
+/*  This part is a copy of: /static/css/admin/product/list.css   */
+/* START: Dylan */
+
+
+@media screen and (min-width: 992px) {
+    
+    /* BUTTONS */
+    .option-buttons:not(.on-top) .col:nth-child(-n+3){
+        display: none;
+    }
+
+}
+/* END: Dylan */
+
+/* BUTTONS */
+/* .option-buttons .hide-summary .material-icons{
+    margin-right: 0px !important;
+} */
+
+

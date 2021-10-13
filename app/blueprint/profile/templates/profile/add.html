@@ -1,0 +1,141 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/profile/add.css') }}">
+{%endblock%}
+
+
+{% block title %}{{'Agregar' if mode == "add" else "Editar"}} Perfil{%endblock%}
+
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    {% if mode == "edit" %}
+    <li><a href="{{url_for('profile.details', token=profile.token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% else %}
+    <li><a href="{{url_for('profile.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% endif %}
+</ul>
+{% endblock sidenav_button %}
+
+
+{% block content %}
+<section>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col s12">
+                <h1 class="h1-size white-text uppercase-font ">{{'Agregar' if mode == "add" else "Editar"}} Perfil</h1>
+            </div>
+
+            <div class="col l9 m12 s12">
+                <div class="card background-2f border-radius-10">
+
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+
+                        <div class="card-content">
+                            <!-- FORM -->
+                            <div class="row">
+                                <!-- PRODUCT NAME -->
+                                <div class="input-field col l12 m12 s12">
+                                    {{ form.profile.label }}
+                                    {{ form.profile }} <br />
+                                    {% for error in form.profile.errors %}
+                                    <span class="text-red">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col l12 m12 s12">
+                                    <label for="status">Estado:</label>
+                                    <p>
+                                        <label>
+                                            <input id="status" name="status" type="radio" class="with-gap" value="1" {% if form.status.data == "1" %}checked{% endif %}>
+                                            <span>Activo</span> 
+                                        </label>
+                                        <label>
+                                            <input id="status" name="status" type="radio" class="with-gap" value="0" {% if form.status.data == "0" %}checked{% endif %}>
+                                            <span>Inactivo</span> 
+                                        </label>
+                                    </p>
+                                </div>                 
+
+                            
+                            </div>                            
+                        </div>
+
+                        <div class="card-action">
+                            <!-- FORM SUBMITS BUTTONS -->
+                            <div class="row center no-margin-bottom">
+                                <div class="col l4 m4 s6" id="btn-cancel">
+                                    {% if mode=="edit" %}
+                                        <a href="{{url_for('profile.details', token=profile.token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                    {% else %}
+                                        <a href="{{url_for('profile.view_list')}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                    {% endif %}
+                                </div>
+
+                                {% if show_finish %}
+                                <div class="col l4 m4 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit" name="submit" type="submit" value="Guardar"> -->
+                                </div>
+                                {% else %}
+                                <div class="col l4 m4 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin", disabled="true") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit" name="submit" type="submit" value="Guardar"> -->
+                                </div>
+                                {% endif %}
+                    
+                                <div class="col l4 m4 s12">
+                                    {{ form.submit_and_finish(class="btn btn-save btn-flat btn-normal-margin") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit_and_finish" name="submit_and_finish" type="submit" value="Guardar y Finalizar"> -->
+                                </div>                                
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+
+            <div class="col l3 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+
+                    <div class="card-content grey-text info-card" id="card_help">
+                        <span class="card-title uppercase-font center">Ayuda</span>
+                        <p>
+                            <strong>Estado:</strong>
+                            <br>
+                            &#9679; Si el perfil está inactivo, no se tendrá en cuenta para las ganancias. 
+                            <br>
+                            &#9679; Es posible activar o desactivar un perfil desde el panel de configuración.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Guardar:</strong>
+                            <br>
+                            &#9679; <b>Guardar:</b> El perfil se guardará en la base de datos y permitirá continuar agregando más perfiles.
+                            <br>
+                            &#9679; <b>Guardar y Finalizar:</b> El perfil se guardará en la base de datos, y finalizará la carga de perfiles.
+                            <br>
+                            &#9679; En algunos casos el botón <b>Guardar</b> no podrá ser presionado. Ejemplo, al editar un perfil. 
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+<!-- <script src="{{ url_for('static', filename='js/admin/product/add.js') }}"></script> -->
+{% endblock %}

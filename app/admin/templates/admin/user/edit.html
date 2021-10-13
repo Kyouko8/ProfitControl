@@ -1,0 +1,63 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+{%endblock%}
+
+
+{% block title %}Editar usuario{%endblock%}
+
+{% block content %}
+
+<section>
+
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col l3 m12 s12"></div>
+
+            <div class="col l6 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+                    <form method="post">
+                        <div class="card-content">
+                            <span class="card-title white-text uppercase-font center">Editar Usuario</span>
+                            
+                            {{form.hidden_tag()}}
+
+                            <div class="input-field">
+                                <input id="name" type="text" class="validate input {{invalid_email}}" name="name" value="{{process_form_data(form.name)}}"  required>
+                                <label for="name" class="label">Nombre Completo</label>
+                                {% for error in form.name.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}
+                            </div>
+            
+                        </div>
+
+                        <div class="card-action center-align">
+                            <button type="submit" id="submit" name="submit" class="btn btn-save">Guardar</button>
+                            
+                            <p class="grey-text">¿Quieres cambiar las credenciales? <a href="{{url_for('admin.user_change_password', **request.args)}}" class="blue-text text-darken-2">Pulsa aquí</a></p>
+                        </div>
+                    </form>
+
+
+                </div>
+
+            </div>
+
+            <div class="col l3 m12 s12"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+<!-- <script src="{{ url_for('static', filename='js/admin/product/add.js') }}"></script> -->
+{% endblock %}

@@ -1,0 +1,165 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/product/add.css') }}">
+{%endblock%}
+
+
+{% block title %}{{"Agregar" if mode == "add" else "Editar"}} Gasto{%endblock%}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    {% if mode == "edit" %}
+    <li><a href="{{url_for('spending.details', token=spending.token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% else %}
+    <li><a href="{{url_for('spending.view_list', workday_token=workday.token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% endif %}
+</ul>
+{% endblock sidenav_button %}
+
+
+{% block content %}
+<section>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col s12">
+                <h1 class="h1-size white-text uppercase-font ">{{"Agregar" if mode == "add" else "Editar"}} Gasto</h1>
+            </div>
+
+            <div class="col l9 m12 s12">
+                <div class="card background-2f border-radius-10">
+
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+
+                        <div class="card-content">
+                            <!-- FORM -->
+                            <div class="row">
+                                <!-- SPENDING NAME -->
+                                <div class="input-field col m12 s12">
+                                    {{ form.spending.label }}
+                                    {{ form.spending }}
+                                    {% for error in form.spending.errors %}
+                                    <span class="msg-error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                    
+                                <!-- DESCRIPTION -->
+                                <div class="input-field col s12 m12">
+                                    {{ form.description.label }}
+                                    {{ form.description }}
+                                    {% for error in form.description.errors %}
+                                    <span class="msg-error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- PRICE -->
+                                <div class="input-field col l6 m6 s12">
+                                    {{ form.price.label }}
+                                    {{ form.price }}
+                                    {% for error in form.price.errors %}
+                                    <span class="msg-error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- PROFILE -->
+                                <div class="input-field col l6 m6 s12">
+                                    {{ form.profile }}
+                                    <label>Perfil</label>
+                                    {% for error in form.profile.errors %}
+                                    <span class="msg-error">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>                            
+                        </div>
+
+                        <div class="card-action">
+                            <!-- FORM SUBMITS BUTTONS -->
+                            <div class="row center no-margin-bottom">
+                                <div class="col l4 m4 s6" id="btn-cancel">
+                                    {% if mode=="edit" %}
+                                    <a href="{{url_for('spending.details', token=spending.token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                    {% else %}
+                                    <a href="{{url_for('spending.view_list', workday_token=workday.token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                    {% endif %}
+                                </div>
+
+                                {% if show_finish %}
+                                <div class="col l4 m4 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit" name="submit" type="submit" value="Guardar"> -->
+                                </div>
+                                {% else %}
+                                <div class="col l4 m4 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin", disabled="true") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit" name="submit" type="submit" value="Guardar"> -->
+                                </div>
+                                {% endif %}
+                    
+                                <div class="col l4 m4 s12">
+                                    {{ form.submit_and_finish(class="btn btn-save btn-flat btn-normal-margin") }}
+                                    <!-- <input class="btn btn-save btn-flat" id="submit_and_finish" name="submit_and_finish" type="submit" value="Guardar y Finalizar"> -->
+                                </div>                                
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+
+            <div class="col l3 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+
+                    <div class="card-content grey-text info-card" id="card_help">
+                        <span class="card-title uppercase-font center">Ayuda</span>
+                        <p>
+                            <strong>Perfil:</strong>
+                            <br>
+                            &#9679; El perfil <b>General</b> asignará el gasto al negocio.
+                            <br>
+                            &#9679; Para <b>dividir un gasto</b> asigne la parte correspondiente a cada uno de los perfiles.
+                            <br>
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Matemáticas:</strong>
+                            <br>
+                            &#9679; Es posible utilizar calculos matemáticos en el campo <b>Monto</b>.
+                        </p>
+                        <hr>
+                        <p>
+                            <strong>Guardar:</strong>
+                            <br>
+                            &#9679; <b>Guardar:</b> El gasto se guardará en la base de datos y permitirá continuar con la carga de los siguentes gastos.
+                            <br>
+                            &#9679; <b>Guardar y Finalizar:</b> El gasto se guardará en la base de datos, y finalizará la carga de gastos.
+                            <br>
+                            &#9679; En algunos casos el botón <b>Guardar</b> no podrá ser presionado. Ejemplo, al editar un gasto. 
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="hide-on-large-only">
+                <div class="fixed-action-btn">
+                    <a class="btn-floating btn-large" href="#card_help">
+                        <i class="large material-icons blue-text">help_outline</i>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

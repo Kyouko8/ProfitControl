@@ -1,0 +1,483 @@
+{% extends "layout.html" %}
+{% from 'macros.html' import tooltip_percent with context %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/tools/nice_price/nice_price.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/product/details.css') }}">
+{% endblock %}
+
+{% block title %} Producto - {{product.name}} {% endblock %}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('product.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Edit #}
+<li><a href="{{url_for('product.add', token=product.token)}}"><i class="left material-icons">edit</i>Editar</a></li>
+
+{# Open with NicePrice #}
+<li><a href="{{url_for('product.tools_nice_price', token=product.token, show_all='true')}}"><i class="left material-icons">price_check</i>Buen Precio</a></li>
+
+{# Compare #}
+<li><a href="{{url_for('product.view_list', compare_token=product.token, show_all='true')}}"><i class="left material-icons">compare</i>Comparar</a></li>
+
+{# Delete #}
+<li class="divider divider-option-buttons"></li>
+<li><a data-url="{{url_for('product.discard', token=product.token)}}" class="nav-btn-delete btn-delete {% if not product.can_be_deleted() %}disabled{% endif %}"><i class="left material-icons">delete</i>Descartar</a></li>
+
+{% endblock nav_options %}
+
+
+{% block content %}
+<div class="container white-text">
+    <!-- OPTION BUTTONS -->
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('product.view_list')}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">arrow_back</i>Volver</a>
+        </div>
+        
+        {# Edit #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('product.add', token=product.token)}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">edit</i>Editar</a>
+        </div>
+
+        {# Delete #}
+        <div class="col l4 m4 s12">
+            <a data-url="{{url_for('product.discard', token=product.token)}}" class="btn btn-block btn-cancel btn-delete {% if not product.can_be_deleted() %}disabled{% endif %} margin-bottom-10">
+                <i class="left material-icons">delete</i>Descartar</a>
+        </div>
+        
+        {# Open with NicePrice #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('product.tools_nice_price', token=product.token, show_all='true')}}" class="btn btn-block">
+                <i class="left material-icons">price_check</i>Buen Precio</a>
+        </div>
+
+        {# Compare #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('product.view_list', compare_token=product.token, show_all='true')}}" class="btn btn-block">
+                <i class="left material-icons">compare</i>Comparar</a>
+        </div>
+    </div>
+</div>
+    
+        
+<section>
+    {% set rcost = cost.get_real_cost() %}
+    <div class="container white-text">
+        <div class="col s12 m12 l12 white-text">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Información General</h1>
+
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">{{product.name}}</span>
+
+                    <div class="row no-margin">
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Descripción: <span class="right normal-font">{{product.description}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Condición: 
+                                {% if product.new %}
+                                    <span class="right normal-font green-text">Nuevo</span>
+                                {% else %}
+                                    <span class="right normal-font yellow-text">Usado</span>
+                                {% endif %}</p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Estado: 
+                                {% if product.active %}
+                                    <span class="right normal-font green-text">Activo</span>
+                                {% else %}
+                                    <span class="right normal-font red-text">Inactivo</span>
+                                {% endif %}</p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Ventas Realizadas: <span class="right normal-font">{{f(product.get_sales_count())}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            {% set stock = product.get_stock()%}
+                            <p class="bold-font">Stock Disponibles: <span class="right normal-font {{get_color(stock, 'white', 'red', 0)}}-text">{{f(stock)}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Costo: <span class="right normal-font red-text text-lighten-3">${{f(cost.cost)}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Costo Extra: <span class="right normal-font red-text text-lighten-3">${{f(cost.extra_cost)}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Costo Total: <span class="right normal-font red-text">${{f(rcost)}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Precio: <span class="right normal-font blue-text">${{f(cost.get_price())}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Ganancia (por Persona): <span class="right normal-font green-text text-lighten-3">${{f(product.get_profile_gain(cost=cost))}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Ganancia Total: <span class="right normal-font green-text">${{f(product.get_gain(cost=cost))}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="hide-on-large-only"> {# Para Mobiles y Tablets#}
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">% de Ganancia (Gan/Cos): <span class="right normal-font">{{f(product.get_percent_gain_by_cost(cost=cost))}}%</span></p>
+                            </div>
+                            
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">% de Ganancia (Gan/Pre): <span class="right normal-font">{{f(product.get_percent_gain(cost=cost))}}%</span></p>
+                            </div>
+                        </div>
+                
+                        <div class="hide-on-med-and-down"> {# Para Desktop#}
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Porcentaje de Ganancia (Gan/Cos): <span class="right normal-font">{{f(product.get_percent_gain_by_cost(cost=cost))}}%</span></p>
+                            </div>
+                            
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Porcentaje de Ganancia (Gan/Pre): <span class="right normal-font">{{f(product.get_percent_gain(cost=cost))}}%</span></p>
+                            </div>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l12 m12 s12">
+                            {% set progress = product.get_percent_gain(cost=cost) %}
+                            {% set progress_color = get_progress_color(100-progress, value_red=30, value_orange=45, value_green=60, default=get_color(progress, "blue", "indigo", divider=25)) %}
+                            <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                data-tooltip='{{tooltip_percent(progress, "Ganancia", "Costo", classes1="green-text", classes2="red-text", title="Ganancia", helper_text="Porcentaje de Ganancia (Gan/Pre)")}}'>
+                                <div class="determinate {{progress_color}}" style="width: {{progress}}%">
+                                    <span class="progress-span">Ganancia {{f(int(progress))}}%</span>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Precio Crítica: <span class="right normal-font">{{product.get_price_status_as_word(cost=cost)}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+                
+                        <div class="col l6 m6 s12">
+                            {% set progress = product.get_price_status_percent(cost=cost) %}
+                            {% set progress_color = product.get_price_status_color(cost=cost) %}
+                            <div class="progress {{progress_color}} lighten-4 progress-bar">
+                                <div class="determinate {{progress_color}}" style="width: {{progress}}%">
+                                    <span class="progress-span">${{cost.get_price()}}</span>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="divider divider-custom"></div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="col l12 m12 s12">
+            <!-- OPTION BUTTONS -->
+            <h3>Información Adicional</h3>
+                
+            <ul class="collapsible expandable">
+                <li>
+                    <div class="collapsible-header">
+                        <div class="row full-width no-margin-bottom">
+                            <div class="col l10 m10 s9">
+                                <i class="left material-icons">bar_chart</i>Estadísticas de Ventas
+                            </div>
+                            <div class="col l2 m2 s3 right-align">
+                                <i class="material-icons expand-more-icon">expand_more</i>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="collapsible-body">
+                        <table>
+                            <div class="row no-margin">
+                                {% if len(sales) >= 2 %}
+                                    <div class="col l12 m12 s12">
+                                        <div class="divider-line divider-transparent"></div>
+                                    </div>
+                                    {% for workday, sale in sales.items() %}
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Fecha: <span class="right normal-font"><a href="{{url_for('workday.details', token=workday.token)}}">{{workday.get_format("/")}}</a></span></p>
+                                    </div>
+                                    
+                                    <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Cantidad: <span class="right normal-font">{{f(sale.quantity)}}</span></p>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Monto: <span class="right normal-font">${{f(int(sale.price))}}</span></p>
+                                    </div>
+                                    
+                                    <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Precio (Prom): <span class="right normal-font">${{f(int(round(sale.price/max(1, sale.quantity))))}}</span></p>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+
+                                    <div class="col l12 m12 s12">
+                                        <div class="divider-line divider-transparent"></div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %} 
+                                    <div class="col l12 m12 s12">
+                                        <p><strong>No se han registrado ventas</strong> en este producto.</p>
+                                    </div>
+                                    <div class="divider divider-custom"></div>
+                                {% endif %}
+                            </div>
+                        </table>
+                    </div>
+                </li>
+
+                <li>
+                    <div class="collapsible-header">
+                        <div class="row full-width no-margin-bottom">
+                            <div class="col l10 m10 s9">
+                                <i class="left material-icons">attach_money</i>Antiguos Costos
+                            </div>
+                            <div class="col l2 m2 s3 right-align">
+                                <i class="material-icons expand-more-icon">expand_more</i>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="collapsible-body">
+                        <table>
+                            <div class="row no-margin">
+                                {% if len(product.costs) >= 2 %}
+                                    <div class="col l12 m12 s12">
+                                        <div class="divider-line divider-transparent"></div>
+                                    </div>
+
+                                    {% for p_cost in product.costs[::-1] %}
+                                        {% if not p_cost == cost %}
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Costo: <span class="right normal-font">${{f(p_cost.cost)}}</span></p>
+                                        </div>
+                                        
+                                        <div class="divider divider-custom hide-on-med-and-up"></div>
+                                
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Costo Extra: <span class="right normal-font">${{f(p_cost.extra_cost)}}</span></p>
+                                        </div>
+                                
+                                        <div class="divider divider-custom"></div>
+
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Precio: <span class="right normal-font">${{f(p_cost.get_price())}}</span></p>
+                                        </div>
+                                        
+                                        <div class="divider divider-custom hide-on-med-and-up"></div>
+                                
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Fecha: <span class="right normal-font">{{p_cost.date.strftime("%d/%m/%Y")}}</span></p>
+                                        </div>
+                                
+                                        <div class="divider divider-custom"></div>
+
+                                        <div class="col l12 m12 s12">
+                                            <div class="divider-line divider-transparent"></div>
+                                        </div>
+                                        
+                                        {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                <div class="col l12 m12 s12">
+                                    <!-- <p><strong>No se han registrado cambios </strong> de <strong>costo</strong> o <strong>costo extra</strong> en este producto.</p> -->
+                                    <p><strong>No se han registrado cambios</strong> en este producto.</p>
+                                </div>
+                                <div class="divider divider-custom"></div>
+                                {% endif %}
+                            </div>
+                        </table>
+                        
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        
+        <div class="col l12 m12 s12">
+            <!-- OPTION BUTTONS -->
+            <h3>Precios</h3>
+
+            <ul class="collapsible expandable">
+                {% set classes = {3: 'active', 4: '', 5: '', 6: '', 7: ''} %}
+                {% set icons = {3: 'price_check', 4: 'attach_money', 5: 'warning', 6: 'highlight_off', 7: 'money_off'} %}
+                {% for _level, _name in {3: 'Recomendado', 4: 'Aceptable', 5: 'Poco Aceptable', 6: 'No recomendado', 7: 'Muy Caro'}.items() %}
+                <li class="{{classes[_level]}}">
+                    <div class="collapsible-header">
+
+                        <div class="row full-width no-margin-bottom">
+                            <div class="col l10 m10 s9">
+                                <i class="left material-icons">{{icons[_level]}}</i>{{_name}}
+                                
+                            </div>
+                            <div class="col l2 m2 s3 right-align">
+                                <i class="material-icons expand-more-icon">expand_more</i>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="collapsible-body">
+                        <table>
+                        {{ recomendation(level=_level, title=_name) }}
+                        </table>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</section>
+
+<div style="margin-top: 80px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('product.add', token=product.token)}}"> <i class="material-icons white-text">edit</i></a>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/libs/buttons.js') }}"></script>
+{% endblock javascript %}
+
+{% macro recomendation(level, title) %}
+<div class="col s12 m12 l12 white-text">
+    <div class="row no-margin">
+        <div class="col l6 m6 s12">
+            <p class="bold-font">Precio: <span class="right normal-font">${{f(product.get_nice_price(cost=cost, level=level))}}</span></p>
+        </div>
+        
+        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+        <div class="col l6 m6 s12">
+            {% set value = product.get_nice_price_difference(cost=cost, level=level) %}
+            {% set color = get_color(value, "red", "green", divider=0)%}
+            <p class="bold-font">Diferencia: <span class="right normal-font {{color}}-text">${{f(value)}}</span></p>
+        </div>
+
+        <div class="divider divider-custom"></div>
+
+
+        <div class="col l6 m6 s12">
+            <p class="bold-font">Ganancia (por Persona): <span class="right normal-font">${{f(product.get_nice_profile_gain(cost=cost, level=level))}}</span></p>
+        </div>
+        
+        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+        <div class="col l6 m6 s12">
+            <p class="bold-font">Ganancia Total: <span class="right normal-font">${{f(product.get_nice_gain(cost=cost, level=level))}}</span></p>
+        </div>
+
+        <div class="divider divider-custom"></div>
+        
+        <div class="hide-on-large-only"> {# Para Mobiles y Tablets#}
+            <div class="col l6 m6 s12">
+                <p class="bold-font">% de Ganancia (Gan/Cos): <span class="right normal-font">{{f(product.get_nice_percent_gain_by_cost(cost=cost, level=level))}}%</span></p>
+            </div>
+            
+            <div class="divider divider-custom hide-on-med-and-up"></div>
+
+            <div class="col l6 m6 s12">
+                <p class="bold-font">% de Ganancia (Gan/Pre): <span class="right normal-font">{{f(product.get_nice_percent_gain(cost=cost, level=level))}}%</span></p>
+            </div>
+
+            <div class="divider divider-custom"></div>
+        </div>
+
+        <div class="hide-on-med-and-down"> {# Para Desktop#}
+            <div class="col l6 m6 s12">
+                <p class="bold-font">Porcentaje de Ganancia (Gan/Cos): <span class="right normal-font">{{f(product.get_nice_percent_gain_by_cost(cost=cost, level=level))}}%</span></p>
+            </div>
+            
+            <div class="divider divider-custom hide-on-med-and-up"></div>
+
+            <div class="col l6 m6 s12">
+                <p class="bold-font">Porcentaje de Ganancia (Gan/Pre): <span class="right normal-font">{{f(product.get_nice_percent_gain(cost=cost, level=level))}}%</span></p>
+            </div>
+
+            <div class="divider divider-custom"></div>
+        </div>
+
+
+        <div class="col l12 m12 s12">
+            {% set progress = product.get_nice_percent_gain(cost=cost, level=level) %}
+            {% set progress_color = get_progress_color(100-progress, value_red=30, value_orange=45, value_green=60, default=get_color(progress, "blue", "indigo", divider=25)) %}
+            <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                data-tooltip='{{tooltip_percent(progress, "Ganancia", "Costo", classes1="green-text", classes2="red-text", title="Ganancia", helper_text="Porcentaje de Ganancia (Gan/Pre)")}}'>
+                <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                    <span class="progress-span">Ganancia {{f(int(progress))}}%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider divider-custom"></div>
+    </div>
+</div>
+{% endmacro %}
+
+
+

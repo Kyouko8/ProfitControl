@@ -1,0 +1,134 @@
+{% extends 'layout.html' %}
+{% from "macros.html" import tooltip_percent with context %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %} Detalle del Gasto - {{spending.name}} {%endblock%}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('spending.view_list', workday_token=workday.token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Edit #}
+<li><a href="{{url_for('spending.add', token=spending.token, workday_token=workday.token)}}" class=""><i class="left material-icons">edit</i>Editar</a></li>
+{# Delete #}
+<li class="divider divider-option-buttons"></li>
+<li><a data-url="{{url_for('spending.discard', token=spending.token)}}" class="nav-btn-delete btn-delete {% if not spending.can_be_deleted() %}disabled{% endif %}"><i class="left material-icons">delete</i>Descartar</a></li>
+{% endblock nav_options %}
+
+
+{% block content %}
+{#% set f = int %#}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('spending.view_list', workday_token=workday.token)}}" class="btn btn-block"><i
+                    class="left material-icons">arrow_back</i>Volver</a>
+        </div>
+        {# Edit #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('spending.add', token=spending.token, workday_token=workday.token)}}" class="btn btn-block"><i
+                    class="left material-icons">edit</i>Editar</a>
+        </div>
+        {# Delete #}
+        <div class="col l4 m4 s12">
+            <a data-url="{{url_for('spending.discard', token=spending.token)}}" class="btn btn-block btn-cancel btn-delete"><i
+                    class="left material-icons">delete</i>Descartar</a>
+        </div>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="container">
+    <div class="row">
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Información del Gasto</h1>
+        </div>
+    
+        <!-- GENERAL -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">{{spending.name}}</span>
+
+                    <div class="row no-margin">
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Nombre: <span class="right normal-font">{{spending.name}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom"></div>
+                        
+                        <div class="col l12 m12 s12">
+                            {% set profile = spending.profile %}
+                            {% if profile is none %}
+                            <p class="bold-font">Perfil: <span class="right normal-font">{{spending.get_profile_name()}}</span></p>
+                            {% else %}
+                            <p class="bold-font">Perfil:
+                                <span class="right normal-font">
+                                    <a href="{{url_for('profile.details', token=profile.token)}}">{{spending.get_profile_name()}}</a></span></p>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="divider divider-custom "></div>
+
+
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Precio: <span class="right normal-font">${{spending.price}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Fecha: <span class="right normal-font">{{workday.get_day_name()}}, {{workday.get_format(" / ")}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Descripcion: <span class="right normal-font">{{spending.get_description()}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l12 m12 s12">
+                            {% set progress = percent(spending.price, workday.get_mount_of_spendings().mount) %}
+                            {% set progress_color = get_color(progress, 'red', 'orange', divider=60) %}
+                            {% set other_progress_color = get_color(100-progress, 'red', 'orange', divider=60) %}
+                            <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                data-tooltip='{{tooltip_percent(progress, "Este Gasto", "Otros Gastos", classes1=progress_color+"-text", classes2=other_progress_color+"-text", title="Detalles", helper_text="Porcentaje de Gastos")}}'>
+                                <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                                    <span class="progress-span">Este Gasto {{f(int(progress))}}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-top: 80px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('spending.add', token=spending.token, workday_token=workday.token)}}"> <i class="large material-icons white-text edit-fab-button">edit</i></a>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,100 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %} Perfil del Usuario {%endblock%}
+
+{% block content %}
+{#% set f = int %#}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('public.home')}}" class="btn btn-block"><i
+                    class="left material-icons">arrow_back</i>Volver</a>
+        </div>
+
+        {# Edit #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('admin.user_edit')}}" class="btn btn-block"><i
+                    class="left material-icons">edit</i>Editar</a>
+        </div>
+
+        {# Password #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('admin.user_change_password')}}" class="btn btn-block">
+                <i class="left material-icons">vpn_key</i>Cambiar Clave</a>
+        </div>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="container">
+    <div class="row">
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Usuario:</h1>
+        </div>
+
+        
+    
+        <!-- GENERAL -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">{{current_user.username}}</span>
+
+                    <div class="row no-margin">
+                            
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Nombre: <span class="right normal-font">{{current_user.username}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom"></div>
+
+
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Email:<span class="right normal-font">{{current_user.email}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Fecha de Creación:<span class="right normal-font">{{current_user.get_creation_date_format(include_time=True)}} UTC</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CERRAR SESIÓN -->
+        <div class="col s12">
+            <div class="row">
+                <div class="col s12 m6 l4">
+                    <a href="{{url_for('admin.user_settings')}}" class="btn btn-secondary btn-block">
+                        <i class="left material-icons">settings</i>Configuración
+                    </a>
+                </div>
+
+                <div class="col s12 m6 l4">
+                    <a href="{{url_for('auth.logout')}}" class="btn btn-secondary btn-block">
+                        <i class="left material-icons">logout</i>Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+{% endblock content %}

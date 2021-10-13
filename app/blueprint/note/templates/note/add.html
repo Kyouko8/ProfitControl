@@ -1,0 +1,123 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+{# <link rel="stylesheet" href="{{ url_for('static', filename='css/admin/note/add.css') }}"> #}
+{%endblock%}
+
+
+{% block title %}{{'Agregar' if mode == "add" else "Editar"}} Nota{%endblock%}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    {% if mode == "edit" %}
+    <li><a href="{{url_for('note.details', token=note.token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% else %}
+    <li><a href="{{url_for('note.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% endif %}
+</ul>
+{% endblock sidenav_button %}
+
+{% block content %}
+<section>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            <div class="col s12">
+                <h1 class="h1-size white-text uppercase-font ">{{'Agregar' if mode == "add" else "Editar"}} Nota</h1>
+            </div>
+
+            <div class="col l9 m12 s12">
+                <div class="card background-2f border-radius-10">
+
+                    <form method="post">
+                        {{ form.hidden_tag() }}
+
+                        <div class="card-content">
+                            <!-- FORM -->
+                            <div class="row">
+                                <!-- TITLE -->
+                                <div class="input-field col l12 m12 s12">
+                                    {{ form.title.label }}
+                                    {{ form.title }} <br />
+                                    {% for error in form.title.errors %}
+                                    <span class="text-red">{{ error }}</span>
+                                    {% endfor %}
+                                </div>               
+
+                                
+                                <!-- CONTENT -->
+                                <div class="input-field col l12 m12 s12">
+                                    {{ form.content.label }}
+                                    {{ form.content(class="materialize-textarea white-text", rows=6, maxlength=8192) }} <br />
+                                    {% for error in form.content.errors %}
+                                    <span class="text-red">{{ error }}</span>
+                                    {% endfor %}
+                                </div> 
+                            
+                            </div>                            
+                        </div>
+
+                        <div class="card-action">
+                            <!-- FORM SUBMITS BUTTONS -->
+                            <div class="row center no-margin-bottom">
+                                <div class="col l4 m4 s6" id="btn-cancel">
+                                    {% if mode=="edit" %}
+                                        <a href="{{url_for('note.details', token=note.token)}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                    {% else %}
+                                        <a href="{{url_for('note.view_list')}}" class="btn btn-cancel btn-flat btn-normal-margin">Cancelar</a>
+                                    {% endif %}
+                                </div>
+
+                                {% if show_finish %}
+                                <div class="col l4 m4 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin") }}
+                                </div>
+                                {% else %}
+                                <div class="col l4 m4 s6">
+                                    {{ form.submit(class="btn btn-save btn-flat btn-normal-margin", disabled="true") }}
+                                </div>
+                                {% endif %}
+                    
+                                <div class="col l4 m4 s12">
+                                    {{ form.submit_and_finish(class="btn btn-save btn-flat btn-normal-margin") }}
+                                </div>                                
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+
+            <div class="col l3 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+
+                    <div class="card-content grey-text info-card" id="card_help">
+                        <span class="card-title uppercase-font center">Ayuda</span>
+                        <p>
+                            <strong>Guardar:</strong>
+                            <br>
+                            &#9679; <b>Guardar:</b> La nota se guardará en la base de datos y permitirá continuar agregando más notas.
+                            <br>
+                            &#9679; <b>Guardar y Finalizar:</b> La nota se guardará en la base de datos, y finalizará la carga de notas.
+                            <br>
+                            &#9679; En algunos casos el botón <b>Guardar</b> no podrá ser presionado. Ejemplo, al editar una nota. 
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript %}
+<!-- <script src="{{ url_for('static', filename='js/admin/product/add.js') }}"></script> -->
+{% endblock %}

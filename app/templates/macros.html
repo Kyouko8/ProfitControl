@@ -1,0 +1,108 @@
+
+{# Dibuja una nota #}
+{% macro draw_note(note_line_list) %}
+
+{% for content_line in note_line_list %}
+<div class="col l12 m12 s12">
+    {% if content_line.startswith("#@") %}    {{draw_switch(content_line[2:])}}
+    {% elif content_line.startswith("#") %}     {{draw_checkbox(content_line[1:])}}
+    {% elif content_line.strip().startswith("**") and content_line.strip().endswith("**") %}<p class="p-note"><strong>{{draw_line(content_line.strip()[2:-2])}}</strong></p>
+    {% elif content_line.strip().startswith("*") %}<p class="p-note">{{draw_line(content_line.split("*", 1)[0])}}&#9679;{{draw_line(content_line.split("*", 1)[1])}}</p>
+    {% elif content_line %}<p class="p-note">{{draw_line(content_line)}}</p>
+    {% else %}<p class="p-note">&nbsp;</p> 
+    {% endif %}
+</div>
+<div class="divider divider-custom"></div>
+{% endfor %}
+
+{% endmacro %}
+
+
+{# Dibuja un checkbox en la nota #}
+{% macro draw_checkbox(data) %}
+{% set value = 0 %} {% set disabled = 1 %} {% set data = data.strip() %}
+{% if data.startswith("!") %}  {% set data = data[1:].strip() %} {% set value = 1 %}  {% endif %}
+{% if data.startswith("*") %}  {% set data = data[1:].strip() %} {% set disabled = 0 %} {% endif %}
+{% if data.startswith("*!") %} {% set data = data[2:].strip() %} {% set value = 1 %}{% set disabled = 0 %} {% endif %}
+{% set name = "autogenc_"+data.split(" ")[0] %}
+<p class="p-note"><label class="padding-left-10 padding-right-10">
+    <input class="filled-in" type="checkbox" {% if value %}checked="true"{% endif %} value="{{value}}" id="chk_{{name}}" name="{{name}}" {% if disabled %}disabled="true"{% endif %}>
+    <span class="white-text">{{draw_line(data)}}</span>
+</label></p>
+{% endmacro %}
+
+{# Dibuja un switch en la nota #}
+{% macro draw_switch(data) %}
+{% set value = 0 %}{% set disabled = 1 %} {% set data = data.strip() %}
+{% if data.startswith("!") %}  {% set data = data[1:].strip() %} {% set value = 1 %}  {% endif %}
+{% if data.startswith("*") %}  {% set data = data[1:].strip() %} {% set disabled = 0 %} {% endif %}
+{% if data.startswith("*!") %} {% set data = data[2:].strip() %} {% set value = 1 %}{% set disabled = 0 %} {% endif %}
+{% set name = "autogens_"+data.split(" ")[0] %}
+<div class="switch"><p class="p-note">{{draw_line(data)}}<label class="padding-left-10 padding-right-10 right">
+    <input class="with-gap" type="checkbox" {% if value %}checked="true"{% endif %} {% if disabled %}disabled="true"{% endif %} value="{{value}}" id="chk_{{name}}" name="{{name}}">
+    <span class="lever"></span>
+</label></p></div>
+{% endmacro %}
+
+{# Dibuja una línea de las notas respetando los espacios #}
+{% macro draw_line(line) %}{% for t in line %}{% if t == " " %}&nbsp;{%else %}{{t}}{% endif %}{% endfor %}{% endmacro %}
+
+
+{#
+    Macro para tooltip de tipo "ProgressBar"
+#}
+{% macro tooltip_percent(percent_value, text1, text2, classes1="white-text", classes2="white-text", classes_value1="white-text", classes_value2="white-text", title="Ayuda", helper_text="") %}
+<div class="row no-margin left-align tooltip-min-width"> {% set show_progress_bar= current_user.get_config_force("show_progress_bar_on_tooltip", 0).as_int() %}
+    <div class="col s12">
+        <p class="bold-font grey-text center uppercase-font">{{title}}</p>
+        <div class="divider-line divider-transparent"></div>
+        {% if helper_text %}
+        <p class="grey-text center">- {{helper_text}} -</p>
+        {% endif %}
+        <p class="bold-font {{classes1}}">{{text1}}: <span class="right normal-font {{classes_value1}}">{{f(int(percent_value))}}%</span></p>
+        {% if show_progress_bar %}<div class="row no-margin"><div class="col l12 m12 s12">
+            {% set progress = percent_value %}
+            <div class="progress background-35 progress-bar-inline"><div class="determinate {{classes1.replace('text-', '').replace('-text', '')}} lighten-2" style="width: {{abs(progress)}}%"></div></div>
+        </div></div>{% endif %}
+        <p class="bold-font {{classes2}}">{{text2}}: <span class="right normal-font {{classes_value2}}">{{f(int(100-int(percent_value)))}}%</span></p>
+        {% if show_progress_bar %}<div class="row no-margin"><div class="col l12 m12 s12">
+            {% set progress = 100-percent_value %}
+            <div class="progress background-35 progress-bar-inline"><div class="determinate {{classes2.replace('text-', '').replace('-text', '')}} lighten-2" style="width: {{abs(progress)}}%"></div></div>
+        </div></div>{% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+
+{# 
+    Macro para crear tooltips avanzados
+    Requiere una lista de diccionarios 
+    Ejemplo de diccionario:    {'key': 'Producto', 'value': 200, 'left': "$", 'right': '.00', 'value_classes': 'green-text', 'key_classes': 'red-text'}
+
+    Además requiere un diccionario para el valor total.
+
+    Los parametros siguientes son opcionales en el diccionario: left, right, value_classes, key_classes
+    Los mismos pueden tener un valor por defecto, se define con las variables de la macro.
+#}
+
+{% macro tooltip_for_total(data, total, classes="", classes_total="", classes_value="white-text", classes_value_total="white-text", left="", right="", title="Ayuda", helper_text="") %}
+<div class="row no-margin left-align tooltip-min-width"> {% set show_progress_bar= current_user.get_config_force("show_progress_bar_on_tooltip", 0).as_int() %}
+    <div class="col s12">
+        <p class="bold-font grey-text center uppercase-font">{{title}}</p>
+        {% if len(data) %}<div class="divider-line divider-transparent"></div>{% for item in data %}
+        <p class="bold-font {{classes}} {{item.get('key_classes', '')}}">{{item.key}}: <span class="right normal-font {{classes_value}} {{item.get('value_classes', '')}}">{{item.get('left', left)}}{{f(item.value)}}{{item.get('right', right)}}</span></p>
+        {% if show_progress_bar %}<div class="row no-margin"><div class="col l12 m12 s12">
+            {% set progress = percent(item.value, total.value) %}
+            <div class="progress background-35 progress-bar-inline"><div class="determinate {{item.get('key_classes', 'white').replace('text-', '').replace('-text', '')}} lighten-2" style="width: {{abs(progress)}}%"></div></div>
+        </div></div>{% endif %}
+        {% endfor %}{% endif %}
+    </div>
+    
+    <div class="divider divider-custom hide-on-med-and-up"></div>
+    
+    <div class="col s12">
+        <div class="divider-line divider-transparent"></div>
+        <p class="bold-font {{classes_total}}">{{total.get('key', 'Total')}}: <span class="right normal-font {{classes_value_total}}">{{total.get('left', left)}}{{f(total.value)}}{{total.get('right', right)}}</span></p>
+    </div>
+</div>
+{% endmacro %}

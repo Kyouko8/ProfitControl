@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %} Detalle del Perfil - {{profile.get_name()}} {%endblock%}
+
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('profile.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Edit #}
+<li><a href="{{url_for('profile.add', token=profile.token)}}" class=""><i class="left material-icons">edit</i>Editar</a></li>
+{# Delete #}
+<li class="divider divider-option-buttons"></li>
+<li><a data-url="{{url_for('profile.discard', token=profile.token)}}" class="nav-btn-delete btn-delete {% if not profile.can_be_deleted() %}disabled{% endif %}"><i class="left material-icons">delete</i>Descartar</a></li>
+{% endblock nav_options %}
+
+{% block content %}
+{#% set f = int %#}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('profile.view_list')}}" class="btn btn-block"><i
+                    class="left material-icons">arrow_back</i>Volver</a>
+        </div>
+
+        {# Edit #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('profile.add', token=profile.token)}}" class="btn btn-block"><i
+                    class="left material-icons">edit</i>Editar</a>
+        </div>
+
+        {# Delete #}
+        <div class="col l4 m4 s12">
+            {% if profile.can_be_deleted() %}
+            <a data-url="{{url_for('profile.discard', token=profile.token)}}" class="btn btn-block btn-cancel btn-delete"><i
+                class="left material-icons">delete</i>Descartar</a>
+            {% else %}
+            <a class="btn btn-block btn-cancel btn-delete disabled"><i class="left material-icons">delete</i>Descartar</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="container">
+    <div class="row">
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">{{profile.get_name()}}</h1>
+        </div>
+    
+        <!-- GENERAL -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">Información del Perfil</span>
+
+                    <div class="row no-margin">
+                        <div class="col l6 m12 s12">
+                            <p class="bold-font">Nombre: <span class="right normal-font">{{profile.get_name()}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-large-only"></div>
+
+                        <div class="col l6 m12 s12">
+                            <p class="bold-font">Estado: {% if profile.active %}
+                                <span class="right normal-font green-text">Activo</span>
+                            {% else %}
+                                <span class="right normal-font red-text">Inactivo</span>
+                            {% endif %}
+                            </p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-top: 80px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('profile.add', token=profile.token)}}"> <i class="large material-icons white-text edit-fab-button">edit</i></a>
+    </div>
+</div>
+{% endblock content %}

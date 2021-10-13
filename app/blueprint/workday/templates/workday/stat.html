@@ -1,0 +1,431 @@
+{% extends 'layout.html' %}
+{% from "macros.html" import tooltip_percent, tooltip_for_total with context %}
+
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %}Estadísticas De Trabajo{%endblock%}
+
+{% block content %}
+{% set f = int %}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('workday.view_list')}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">arrow_back</i>Volver
+            </a>
+        </div>
+        
+        {# active graphics #}
+        <div class="col l4 m4 s12">
+            {% if graphics %}
+            <a href="{{url_for('workday.stats')}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">bar_chart</i>Ocultar Gráficos
+            </a>
+            {% else %}
+            <a href="{{url_for('workday.stats', graphics='true')}}" class="btn btn-block margin-bottom-10">
+                <i class="left material-icons">bar_chart</i>Mostrar Gráficos
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+<!-- TITLE -->
+<div class="container">
+
+    <div class="row">
+
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Estadísticas Generales</h1>
+        </div>
+
+    </div>
+
+    <!-- Resumen -->
+    <div class="Resumen" id="show_table">
+        <ul class="collapsible">
+            <!-- Mes a mes -->
+            {% for month, data in months.items() %}
+            <li>
+                {{ make_collapsible (data, "{m} / {y}".format(m=get_month_name(month[1]), y=month[0]), True)}}
+            </li>
+            {% endfor %}
+        
+            <!-- Total -->
+            <li class="active">
+                {{ make_collapsible (total, "Total", False)}}
+            </li>
+
+            {% if graphics %}
+            <li>
+                {{ draw_graphics_profit (workdays, "Todos los días (Ganancias)", total)}}
+            </li>
+            <li>
+                {{ draw_graphics_price (workdays, "Todos los días (Ventas)", total)}}
+            </li>
+            {% endif %}
+        </ul>
+        
+    </div>
+</div>
+{% endblock content %}
+
+
+{% macro make_collapsible(data, title, is_month) %}
+<div class="collapsible-header"><b>{{title}}</b></div>
+<div class="collapsible-body">
+    <p><b>Resumen General</b></p>
+    <table>
+        <div class="col s12 m12 l12 white-text">
+            <div class="row no-margin">
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Productos Vendidos: <span class="right normal-font">{{f(data.quantity)}}</span></p>
+                </div>
+                
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12">
+                    {% if data.default_price - data.price > 0 %}
+                    <p class="bold-font">Descuentos: <span class="right normal-font red-text">${{f(int(data.default_price - data.price))}}</span></p>
+                    {% else %}
+                    <p class="bold-font">Aumentos: <span class="right normal-font green-text">${{f(int(data.price - data.default_price))}}</span></p>
+                    {% endif %}
+                </div>
+        
+                <div class="divider divider-custom"></div>
+
+
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Ventas: <span class="right normal-font">${{f(data.price)}}</span></p>
+                </div>
+                
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Inversión: <span class="right normal-font">${{f(data.cost)}}</span></p>
+                </div>
+        
+                <div class="divider divider-custom"></div>
+
+
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Ganancia (por Persona): <span class="right normal-font">${{f(data.profit_profile)}}</span></p>
+                </div>
+                
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Ganancia Total: <span class="right normal-font">${{f(data.profit)}}</span></p>
+                </div>
+
+                <div class="hide-on-large-only"> {# Para Mobiles y Tablets#}
+                    <div class="col l6 m6 s12">
+                        <p class="bold-font">% de Ganancia (Gan/Cos): <span class="right normal-font">{{f(data.percent_profit_cost)}}%</span></p>
+                    </div>
+                    
+                    <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                    <div class="col l6 m6 s12">
+                        <p class="bold-font">% de Ganancia (Gan/Pre): <span class="right normal-font">{{f(data.percent_profit_price)}}%</span></p>
+                    </div>
+        
+                </div>
+        
+                <div class="hide-on-med-and-down"> {# Para Desktop#}
+                    <div class="col l6 m6 s12">
+                        <p class="bold-font">Porcentaje de Ganancia (Gan/Cos): <span class="right normal-font">{{f(data.percent_profit_cost)}}%</span></p>
+                    </div>
+                    
+                    <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                    <div class="col l6 m6 s12">
+                        <p class="bold-font">Porcentaje de Ganancia (Gan/Pre): <span class="right normal-font">{{f(data.percent_profit_price)}}%</span></p>
+                    </div>
+                
+                </div>
+                
+                <div class="divider divider-custom"></div>
+                
+
+                <div class="col l12 m12 s12">
+                    {% set progress = data.percent_profit_price %}
+                    {% set progress_color = get_progress_color(100-progress, value_red=30, value_orange=45, value_green=60, default=get_color(progress, "blue", "indigo", divider=25)) %}
+                    <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                        data-tooltip='{{tooltip_percent(progress, "Ganancia", "Costo y Gastos", classes1="green-text", classes2="red-text", title="Ganancia", helper_text="Porcentaje de Ganancia (Gan/Pre)")}}'>
+                        <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                            <span class="progress-span">Ganancia {{f(int(progress))}}%</span>
+                        </div>
+                    </div>
+                </div>
+        
+                <div class="divider divider-custom"></div>
+             
+                <div class="divider divider-custom"></div>
+
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Nro. de Gastos Totales: <span class="right normal-font">{{f(data.spendings_total_count)}}</span></p>
+                </div>
+                
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Monto en Gastos Totales: <span class="right normal-font">${{f(data.spendings_total)}}</span></p>
+                </div>
+        
+                <div class="divider divider-custom"></div>
+
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Nro. de Gastos Generales: <span class="right normal-font">{{f(data.spendings_general_count)}}</span></p>
+                </div>
+                
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Monto en Gastos Generales: <span class="right normal-font">${{f(data.spendings_general)}}</span></p>
+                </div>
+        
+                <div class="divider divider-custom"></div>
+
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Mejor Venta: <span class="right normal-font">${{f(data.max_price)}}</span></p>
+                </div>
+                
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Mejor Ganancia: <span class="right normal-font">${{f(data.max_profit)}}</span></p>
+                </div>
+        
+                <div class="divider divider-custom"></div>
+
+        
+                {% if data.workdays_count >= 1 %}
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Días Trabajados: <span class="right normal-font">{{f(data.workdays_count)}}</span></p>
+                </div>
+                
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Ventas Promedio: <span class="right normal-font">${{f(int(data.price / data.workdays_count))}}</span></p>
+                </div>
+        
+                <div class="divider divider-custom"></div>
+
+
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Ganancia Promedio: <span class="right normal-font">${{f(int(data.profit / data.workdays_count))}}</span></p>
+                </div>
+                
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Ganancia Promedio (por Persona): <span class="right normal-font">${{f(int(data.profit_profile / data.workdays_count))}}</span></p>
+                </div>
+        
+                <div class="divider divider-custom"></div>
+
+
+                <div class="col l6 m6 s12">
+                    <p class="bold-font">Promedio de Productos Vendidos: <span class="right normal-font">{{f(int(data.quantity / data.workdays_count))}}</span></p>
+                </div>
+            
+                <div class="divider divider-custom hide-on-med-and-up"></div>
+        
+                <div class="col l6 m6 s12 hide-on-small-only">
+                </div>
+        
+                <div class="divider divider-custom hide-on-small-only"></div>
+                {% endif %}
+
+    </table><br>
+
+    <ul class="collapsible">
+        <li>
+            <div class="collapsible-header"><b>Perfiles</b></div>
+            <div class="collapsible-body">
+                
+                <table>
+                    {% for profile, resume in data.profiles.items() %}
+                    <div class="col s12 m12 l12 white-text">
+                        <div class="row no-margin">
+                            <div class="col l12 m12 s12">
+                                <h4>{{profile.name.upper()}}</h4>
+                            </div>
+
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Nro. de Gastos: <span class="right normal-font">{{f(resume.spending_count)}}</span></p>
+                            </div>
+                            
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                    
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Monto en Gastos: <span class="right normal-font">${{f(resume.spending)}}</span></p>
+                            </div>
+                    
+                            <div class="divider divider-custom"></div>
+            
+            
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Ganancia: <span class="right normal-font">${{f(data.profit_profile - resume.spending)}}</span></p>
+                            </div>
+                            
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                    
+                            <div class="hide-on-large-only"> {# Para Mobiles y Tablets#}
+                                <div class="col l6 m6 s12">
+                                    <p class="bold-font">% de Gastos: <span class="right normal-font">{{f(percent(resume.spending, data.profit_profile))}}%</span></p>
+                                </div>
+                            </div>
+                    
+                            <div class="hide-on-med-and-down"> {# Para Desktop#}
+                                <div class="col l6 m6 s12">
+                                    <p class="bold-font">Porcentaje de Gastos: <span class="right normal-font">{{f(percent(resume.spending, data.profit_profile))}}%</span></p>
+                                </div>
+                            </div>
+                            
+                            <div class="divider divider-custom"></div>
+                    
+                            
+                            <div class="col l12 m12 s12">
+                                {% set progress = percent(data.profit_profile-resume.spending, data.profit_profile) %}
+                                {% set progress_color = get_progress_color(progress, value_red=30, value_orange=45, value_green=60, default=get_color(progress, "blue", "indigo", divider=25)) %}
+                                <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                    data-tooltip='{{tooltip_percent(progress, "Ganancia", "Gastos", classes1="green-text", classes2="red-text", title="Ganancia", helper_text="Porcentaje de Ganancia")}}'>
+                                    <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                                        <span class="progress-span">Ganancia {{f(int(progress))}}%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="divider divider-custom"></div>
+
+                            
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Ganancia Promedio: <span class="right normal-font">${{f(int(round((data.profit_profile - resume.spending) / data.workdays_count)))}}</span></p>
+                            </div>
+                            
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                    
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Gastos Promedio: <span class="right normal-font">${{f(int(round(resume.spending / data.workdays_count)))}}</span></p>
+                            </div>
+                    
+                            <div class="divider divider-custom"></div>
+
+                            <div class="col l6 m6 s12">
+                                <p class="bold-font">Mejor Ganancia: <span class="right normal-font">${{f(resume.max_profit)}}</span></p>
+                            </div>
+                        
+                            <div class="divider divider-custom hide-on-med-and-up"></div>
+                    
+                            <div class="col l6 m6 s12 hide-on-small-only">
+                            </div>
+                    
+                            <div class="divider divider-custom hide-on-small-only"></div>
+                        </div>
+                    </div>
+                    <br>
+                    {% endfor %}
+                </table>
+            </div>
+        </li>
+
+        {% if is_month %}
+        <li>
+            <div class="collapsible-header"><b>Días de Trabajo</b><span class="badge">{{len(data.workdays)}}</span></div>
+            <div class="collapsible-body" style="padding-left: 0px; padding-right: 0px;">
+                <div class="collection">
+                    {% for workday in data.workdays %}
+                    <a href="{{url_for('workday.details', token=workday.token)}}" class="collection-item white-text grey darken-4">
+                        {{workday.get_format()}}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </li>
+        {% if graphics %}
+        <li>
+            {{draw_graphics_profit(data.workdays, title+" (Ganancias)", data)}}
+        </li>
+        
+        <li>
+            {{draw_graphics_price(data.workdays, title+" (Ventas)", data)}}
+        </li>
+        {% endif %}
+        {% endif %}
+    </ul>
+</div>
+{% endmacro %}
+
+
+{% macro draw_graphics_profit(workdays_list, title, reference) %}
+<div class="collapsible-header"><b>Grafíco: {{title}}</b></div>
+<div class="collapsible-body">
+    <b>Mejor Ganancia: </b>${{reference.max_profit}}
+    <p>Los siguientes gráficos son calculados en referencia a la mejor ganancia.</p>
+    <table class="">
+        {% for workday in workdays_list %}
+        {% set data = data_workdays[workday] %}
+        <tr>
+            <td width="25%"><b>{{workday.get_format()}}</b></td>
+            <td width="75%" colspan="3">
+                {% set progress = percent(data.resume.profit, reference.max_profit) %}
+                <div class="progress blue lighten-4 progress-bar tooltipped-click" data-position="top"
+                    data-tooltip='{{tooltip_graphics_profit(reference, data, progress)}}'>
+                    <div class="determinate blue" style="width: {{progress}}%">
+                        <span class="progress-span">${{data.resume.profit}} - %{{progress}}</span></div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endmacro %}
+
+{% macro draw_graphics_price(workdays_list, title, reference) %}
+<div class="collapsible-header"><b>Grafíco: {{title}}</b></div>
+<div class="collapsible-body">
+    <b>Mejor Venta: </b>${{reference.max_price}}
+    <p>Los siguientes gráficos son calculados en referencia a la mejor venta.</p>
+    <table class="">
+        {% for workday in workdays_list %}
+        {% set data = data_workdays[workday] %}
+        <tr>
+            <td width="25%"><b>{{workday.get_format()}}</b></td>
+            <td width="75%" colspan="3">
+                {% set progress = percent(data.resume.price, reference.max_price) %}
+                <div class="progress blue lighten-4 progress-bar tooltipped-click" data-position="top"
+                    data-tooltip='{{tooltip_graphics_price(reference, data, progress)}}'>
+                    <div class="determinate blue" style="width: {{progress}}%">
+                        <span class="progress-span">${{data.resume.price}} - {{progress}}%</span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endmacro %}
+
+{% macro tooltip_graphics_profit(reference, data, progress) %}
+{{tooltip_for_total([
+    {"key_classes": "red-text", "key": "Diferencia", "value": reference.max_profit-data.resume.profit},
+    {"key_classes": "green-text", "key": "Monto", "value": data.resume.profit},
+], {'key': 'Porcentaje', 'value': progress, "left": "", "right": "%"}, left="$", title="Diferencia de Ganancia")}}
+{% endmacro %}
+
+{% macro tooltip_graphics_price(reference, data, progress) %}
+{{tooltip_for_total([
+    {"key_classes": "red-text", "key": "Diferencia", "value": reference.max_price-data.resume.price},
+    {"key_classes": "green-text", "key": "Monto", "value": data.resume.price},
+], {'key': 'Porcentaje', 'value': progress, "left": "", "right": "%"}, left="$", title="Diferencia de Ventas")}}
+{% endmacro %}

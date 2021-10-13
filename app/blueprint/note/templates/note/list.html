@@ -1,0 +1,233 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %}Listar de Perfiles{%endblock%}
+
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('public.home')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Add #}
+<li><a href="{{url_for('note.add')}}"><i class="left material-icons">note_add</i>Agregar</a></li>
+{% endblock nav_options %}
+
+<!--Search Button -->
+{% block search_nav_button %}{% endblock search_nav_button %}
+
+{% block content %}
+<section>
+    <div class="container">
+        <!-- OPTION BUTTONS -->
+        
+        <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+            {# Back #}
+            <div class="col l4 m4 s12">
+                <a href="{{url_for('public.home')}}" class="btn btn-block"><i class="left material-icons">arrow_back</i>Volver</a>
+            </div>
+
+            {# Add #}
+            <div class="col l4 m4 s12">
+                <a href="{{url_for('note.add')}}" class="btn btn-block"><i class="left material-icons">note_add</i>Agregar</a>
+            </div>
+        </div>
+
+
+        <!-- NOTE LIST -->
+        <div class="row">
+            <div class="col l12 m12 s12">
+                <p class="hide-on-med-and-down">&nbsp;<br></p>
+                <div class="row">
+                    <div class="col l9 m12 s12 margin-top-20">
+                        <h1 class="h1-size white-text uppercase-font no-margin">Lista de Notas</h1>
+                    </div>
+                    {# search #}
+                    <div class="col l3 m12 s12 right-align margin-top-20 hide-on-med-and-down">
+                        <a href="#!" id="fast_search_switch" class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-10 tooltipped"
+                            data-position="bottom" data-tooltip="Buscar">
+                            <i class="material-icons">search</i></a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FastSearch -->
+            <div class="col l12 m12 s12 no-display" id="fast_search_section">
+                <p class="grey-text">Resultados de la búsqueda: <span id="searchNumberInfo">{{len(notes)}}</span> / {{len(notes)}} coincidencias</p>
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+                        <div class="row no-margin">
+                            <div class="col s9 m10 l11">
+                                <input  class="white-text" type="text" id="fast_search_input" placeholder="Búsqueda rápida">
+                            </div>
+                            <div class="col s2 m1 l1">
+                                <a href="#!" class="btn btn-flat btn-secondary center tooltipped" id="fast_search_mode" data-mode="all" data-position="bottom" data-tooltip="Buscar en todos">
+                                    <i class="tiny material-icons white-text center">filter_9_plus</i>    
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="col l12 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+
+                        <table id="sorted_table">
+                            <thead> 
+                                <tr class="grey-text">
+                                    <th data-type="name">Nombre <i class="material-icons tiny"></i></th>
+                                    <th data-type="date" class="hide-on-small-only">Fecha <i class="material-icons tiny">arrow_drop_up</i></th> {# hide on mobile #}
+                                    <th class="hide-on-med-and-down">Opciones <i class="material-icons tiny"></i></th> {# only show on desktop #}
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                                {% for note in notes %}
+                                    <tr class="white-text lighten-3">
+                                        <!-- nombre -->
+                                        <td>
+                                            <a href="{{ url_for('note.details', token=note.token) }}" class="white-text btn-open-in-new row-title">
+                                                <i class="tiny left material-icons hide-on-med-and-down">open_in_new</i> {{note.title}}   
+                                            </a>
+                                        </td>
+
+                                        <!-- fecha --> {# hide on mobile #}
+                                        <td class="hide-on-small-only white-text darken-4">{{note.get_format()}}</td> 
+                                            
+                                        <!-- opciones --> {# only show on desktop #}
+                                        <td class="row-options hide-on-med-and-down">
+                                            <div class="row no-margin">
+                                                <div class="col {% if note.can_be_deleted() %} l6 {%else%} l12 {%endif%} m12 s12">
+                                                    <a href="{{url_for('note.add', token=note.token)}}" class="btn btn-flat btn-block btn-edit">
+                                                        <i class="tiny material-icons center">edit</i>
+                                                    </a>
+                                                </div>
+                                                <div class="col l6 m12 s12">
+                                                    {% if note.can_be_deleted() %}
+                                                    <a data-url="{{url_for('note.discard', token=note.token)}}" class="btn btn-flat btn-delete">
+                                                        <i class="tiny material-icons center">delete</i>
+                                                    </a>
+                                                    {%endif%}
+                                                </div>                                                    
+                                            </div>
+                                        </td> 
+                                    </tr>
+        
+                                {%endfor%}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NOTE LIST: WorkDays -->
+        {% if len(workdays) > 0 %}
+        <div class="row">
+            <div class="col l12 m12 s12">
+                <div class="row">
+                    <div class="col l12 m12 s12 margin-top-20">
+                        <h1 class="h1-size white-text uppercase-font no-margin">Lista de Notas de Días de Trabajo</h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="col l12 m12 s12">
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+                        <table>
+                            <thead> 
+                                <tr class="grey-text">
+                                    <th class="hide-on-small-only">Fecha</th> {# hide on mobile #}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for workday in workdays %}
+                                    <tr class="white-text lighten-3">
+                                        <!-- nombre -->
+                                        <td>
+                                            <a href="{{ url_for('note.workday_note_details', token=workday.token) }}" class="white-text btn-open-in-new row-title">
+                                                <i class="tiny left material-icons hide-on-med-and-down">open_in_new</i> {{workday.get_format()}}   
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- NOTE LIST: ShoppingDays -->
+        {% if len(shoppingdays) > 0 %}
+        <div class="row">
+            <div class="col l12 m12 s12">
+                <div class="row">
+                    <div class="col l12 m12 s12 margin-top-20">
+                        <h1 class="h1-size white-text uppercase-font no-margin">Lista de Notas de Días de Compras</h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="col l12 m12 s12">
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+                        <table>
+                            <thead> 
+                                <tr class="grey-text">
+                                    <th class="hide-on-small-only">Fecha</th> {# hide on mobile #}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for shoppingday in shoppingdays %}
+                                    <tr class="white-text lighten-3">
+                                        <!-- nombre -->
+                                        <td>
+                                            <a href="{{ url_for('note.shoppingday_note_details', token=shoppingday.token) }}" class="white-text btn-open-in-new row-title">
+                                                <i class="tiny left material-icons hide-on-med-and-down">open_in_new</i> {{shoppingday.get_format()}}   
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {%endfor%}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>  
+    
+    <div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+        <div class="fixed-action-btn">
+            <a class="btn-floating blue btn-large" href="{{url_for('note.add')}}"> <i class="large material-icons white-text">add</i></a>
+        </div>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/libs/sort.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/buttons.js') }}"></script>
+{% endblock %}
+

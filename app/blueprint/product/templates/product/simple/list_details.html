@@ -1,0 +1,168 @@
+{% extends 'layout.html' %}
+{% from "macros.html" import tooltip_percent with context %}
+
+
+{% block title %} Resumen del Productos{%endblock%}
+
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('product.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# JSON-Download #}
+<li><a href="{{url_for('download.json_products')}}"><i class="left material-icons">file_download</i>Descargar Copia</a></li>
+{# JSON-Import #}
+<li><a href="{{url_for('download.upload_backup_products')}}"><i class="left material-icons">file_upload</i>Importar Copia</a></li>
+{% endblock nav_options %}
+
+{% block content %}
+{#% set f = int %#}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('product.view_list')}}" class="btn btn-block"><i
+                    class="left material-icons">arrow_back</i>Volver</a>
+        </div>
+        {# JSON-Download #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('download.json_products')}}" class="btn btn-block"><i
+                    class="left material-icons">file_download</i>Descargar Copia</a>
+        </div>
+        {# JSON-Import #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('download.upload_backup_products')}}" class="btn btn-block"><i
+                    class="left material-icons">file_upload</i>Importar Copia</a>
+        </div>
+        
+    </div>
+
+</div>
+
+<!-- TITLE -->
+<div class="container white-text">
+    <div class="row">
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Resumen de Productos</h1>
+        </div>
+    
+        <!-- GENERAL -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">General</span>
+
+                    <div class="row no-margin">
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Productos: <span class="right normal-font">{{f(total.products)}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Disponibles: <span class="right normal-font">{{f(total.available_products)}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Stock Disponible: <span class="right normal-font">{{f(total.stock)}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Ventas Realizadas: <span class="right normal-font">{{f(total.sales)}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Productos Ocultos: <span class="right normal-font">{{f(total.products_dont_show)}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Monto Invertido: <span class="right normal-font">${{f(total.cost)}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Productos Nuevos: <span class="right normal-font">{{f(total.new)}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Productos Usados: <span class="right normal-font">{{f(total.used)}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l12 m12 s12">
+                            {% set progress = percent(total.new_stock, total.stock) %}
+                            {% set progress_color = get_progress_color(progress, value_red=2, value_orange=10) %}
+                            <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                data-tooltip='{{tooltip_percent(progress, "Nuevos", "Usados", classes1="green-text", classes2="red-text", title="Stock Disponible", helper_text="Porcentaje de Productos Nuevos")}}'>
+                                <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                                    <span class="progress-span">Nuevos %{{f(int(progress))}}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">Historial</span>
+
+                    <div class="row no-margin">
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Dinero de Ventas: <span class="right normal-font">${{f(total.sales_price)}}</span></p>
+                        </div>
+                        
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Ganancia Aproximada: <span class="right normal-font">${{f(total.sales_gain)}}</span></p>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l12 m12 s12">
+                            {% set progress = percent(total.sales_gain, total.sales_price) %}
+                            {% set progress_color = get_progress_color(progress) %}
+                            <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                data-tooltip='{{tooltip_percent(progress, "Ganancia", "Inversión", classes1="green-text", classes2="red-text", title="Ganancia Aproximada", helper_text="Porcentaje de Ganancia (Gan/Ven)")}}'>
+                                <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                                    <span class="progress-span">Ganancia %{{f(int(progress))}}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider divider-custom"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- <div style="height: 10000px;"></div> -->
+{% endblock content %}

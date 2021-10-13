@@ -1,0 +1,152 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import tooltip_percent, tooltip_for_total, calculator with context %}
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %} Perfil del Usuario {%endblock%}
+
+{% block content %}
+{#% set f = int %#}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('public.home')}}" class="btn btn-block"><i
+                    class="left material-icons">arrow_back</i>Volver</a>
+        </div>
+
+        {# Edit #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('admin.user_details')}}" class="btn btn-block"><i
+                    class="left material-icons">person</i>{{current_user.username}}</a>
+        </div>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="container">
+    <div class="row">
+
+        <!-- AJUSTES -->
+        <input type="hidden" id="user_id" value="{{current_user.id}}">
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Configuración:</h1>
+        </div>
+
+        <!-- Interfaz General -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">Interfáz General</span>
+                    <table>
+                        <tr> <td>{{switch("Vista simple", "simple_mode", 1,
+                                            note="Muestra únicamente los datos de mayor importancia.")}}</td> </tr>
+                        <tr> <td>{{switch("Barras de Progreso en Dialogos", "show_progress_bar_on_tooltip", 0,
+                                            note="Muestra una barra de progreso en los cuadros de dialogos.")}} </td> </tr>
+                        <tr> <td>{{switch("Mostrar Botón Flotante", "show_btn_floating", 0,
+                                            note="Muestra un botón flotante en los listados para poder agregar datos (por ejemplo, productos).",
+                                            info="Esta configuración solo afecta a los usuarios de computadoras.")}} </td> </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Productos -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">Productos</span>
+                    <table>
+                        <tr> <td>{{switch("Mostrar Productos Ocultos", "show_all_products", 0,
+                            note="Se mostrarán de forma predeterminada los productos que no posean stock o que estén inactivos.")}}</td> </tr>
+                        <tr> <td>{{switch("Siempre Mostrar Barra de Búsqueda", "show_searchbar_product", 0, disable_config="product_split_by",
+                                            note="El menú de búsqueda rápido estará siempre presente al utilizar esta sección.",
+                                            warning="No será posible modificar la cantidad de productos mostrada en el listado.")}}</td> </tr>
+                        <tr> <td>{{radiobutton("Cantidad Mostrada en el Listado", "product_split_by", [25, 50, 75, 100, 150, 200], default_value=50,
+                                            note="Seleccione la cantidad de productos que desea mostrar por cada página del listado de productos.")}}</td> </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        
+        <!-- Clientes -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">Clientes</span>
+                    <table>
+                        <tr> <td>{{switch("Siempre Mostrar Barra de Búsqueda", "show_searchbar_client", 0,
+                                            note="El menú de búsqueda rápido estará siempre presente al utilizar esta sección.",)}}</td> </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seguridad e Inicio de Sesión-->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">Inicio de Sesión</span>
+                    <table>
+                        <tr> <td>{{switch("Inicio rápido", "can_log_fast", 1,
+                                            note="Permite que el usuario quede registrado en la lista de inicios recientes en cada equipo en que inició sesión.",
+                                            info="La contraseña será solicitada siempre sin importar si esta configuración está activa.")}}</td> </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/admin/user/config.js')}}"></script>
+{% endblock %}
+
+{% macro switch(title, name, default_value=0, disable_config=none, enable_config=none, note=none, warning=none, info=none) %}
+{% set current_value = current_user.get_config_force(name, default_value).as_int() %}
+<div class="row no-margin" id="config_{{name}}">
+    <div class="col l11 m10 s10">
+        <p class="bold-font padding-left-10 padding-right-10">{{title}}</p>
+        {% if not note is none %}<p class="grey-text padding-left-10 padding-right-10">{{note}}</p>{% endif %}
+        {% if not warning is none %}<p class="grey-text padding-left-10 padding-right-10"><i class="material-icons tiny">warning</i> {{warning}}</p>{% endif %}
+        {% if not info is none %}<p class="grey-text padding-left-10 padding-right-10"><i class="material-icons tiny">info</i> {{info}}</p>{% endif %}
+    </div>
+    <div class="col s2 m2 l1 switch padding-right-10">
+        <label class="right">
+            <input class="config-checkbox" type="checkbox" id="{{name}}" name="{{name}}" {% if current_value %}checked="true"{% endif %} 
+            {% if disable_config %}data-disable-config="{{disable_config}}"{% endif %} {% if enable_config %}data-enable-config="{{enable_config}}"{% endif %}>
+            <span class="lever"></span>
+        </label>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro radiobutton(title, name, values, default_value=0, note=none, warning=none) %}
+{% set current_value = current_user.get_config_force(name, default_value).value %}
+<div class="row no-margin" id="config_{{name}}">
+    <div class="col l12 m12 s12">
+        <p class="bold-font padding-left-10 padding-right-10">{{title}}</p>
+        {% if not note is none %}<p class="grey-text padding-left-10 padding-right-10">{{note}}</p>{% endif %}
+        {% if not warning is none %}<p class="grey-text padding-left-10 padding-right-10"><i class="material-icons tiny">warning</i> {{warning}}</p>{% endif %}
+    </div>
+    <div class="col l12 m12 s12 margin-top-5">
+        <div class="row no-margin">
+            {% for value in values %}
+            <div class="col s6 m4 l2">
+                <label class="padding-left-10 padding-right-10">
+                    <input class="config-radio with-gap" type="radio" {% if str(value) == current_value %}checked="true"{% endif %} value="{{value}}" id="{{name}}_{{value}}" name="{{name}}">
+                    <span>{{value}}</span>
+                </label>
+            </div> 
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endmacro %}

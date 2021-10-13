@@ -1,0 +1,86 @@
+{% extends 'layout.html' %}
+
+{% block title %} {{'Agregar' if mode == "add" else "Editar"}} Día de Trabajo {% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/workday/add.css') }}">
+{% endblock %}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    {% if mode=="edit" %}
+    <li><a href="{{url_for('workday.details', token=workday.token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% else %}
+    <li><a href="{{url_for('workday.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% endif %}
+</ul>
+{% endblock sidenav_button %}
+
+{% block content %}
+<section>
+
+    <div class="container">
+
+        <div class="col l12 m12 s12">
+            <h1 class="h1-size white-text uppercase-font">
+                {{'Agregar' if mode == "add" else "Editar"}} Día de Trabajo
+            </h1>
+        </div>
+
+        <div class="col l12 m12 s12">
+            <div class="card background-2f border-radius-10">
+                <form method="post">
+                    {{ form.hidden_tag() }}
+                    <div class="card-content">
+                        <div class="row no-margin">
+                            <div class="col l10 m10 s8">
+                                <input type="text" class="datepicker datedefault white-text" id="date" name="date" placeholder="Introduzca la Fecha" data-default-value="{{ form.date.data }}" required>
+                                <span class="helper-text grey-text">DD/MM/YYYY</span><br>
+                                {% for error in form.date.errors %}
+                                <span style="color:red;">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col l2 m2 s4">
+                                <button class="btn border-radius-5 btn-add-actual-date btn-secondary btn-block" id="btn-add-actual-date" type="button">Fecha Actual</button>
+                            </div>
+
+                            <!-- NOTE -->
+                            <div class="input-field col l12 m12 s12">
+                                {{ form.note.label }}
+                                {{ form.note(class="materialize-textarea white-text", rows=6, maxlength=2048) }} <br />
+                                {% for error in form.note.errors %}
+                                <span class="text-red">{{ error }}</span>
+                                {% endfor %}
+                            </div> 
+
+                        </div>
+                    </div>
+
+                    <div class="card-action border-radius-10">
+                        <div class="row no-margin">
+
+                            <div class="col l6 m6 s6">
+                                {% if mode=="edit" %}
+                                <a href="{{url_for('workday.details', token=workday.token, resume='true')}}" class="btn border-radius-5 btn-cancel">Cancelar</a>
+                                {% else %}
+                                <a href="{{url_for('workday.view_list')}}" class="btn border-radius-5 btn-cancel">Cancelar</a>
+                                {% endif %}
+                            </div>
+
+                            <div class="col l6 m6 s6 right-align">
+                                <button type="submit" class="btn border-radius-5 btn-save" id="submit" name="submit">Guardar</button>
+                            </div>
+                        </div>    
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</section>
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/admin/workday/add.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,584 @@
+{% extends "layout.html" %}
+{% from "macros.html" import tooltip_percent with context %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/tools/nice_price/nice_price.css') }}">
+{% endblock %}
+
+{% block title %} Buen Precio {% endblock %}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    {% if request.args.get('token') is none %}
+    <li><a href="{{url_for('public.home')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% else %}
+    <li><a href="{{url_for('product.details', token=request.args.get('token'))}}"  class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+    {% endif %}
+</ul>
+{% endblock sidenav_button %}
+
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Product options #}
+{% if not request.args.get('token') is none %}
+    {# Add #}
+    <li><a href="{{url_for('product.details', token=request.args.get('token'))}}"><i class="material-icons">info</i>Ver Producto</a></li>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<!-- OPTION BUTTONS -->
+<div class="container">
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            {% if request.args.get('token') is none %}
+            <a href="{{url_for('public.home')}}" class="btn btn-block"><i
+                class="left material-icons">arrow_back</i>Volver</a>
+            {% else %}
+            <a href="{{url_for('product.details', token=request.args.get('token'))}}" class="btn btn-block"><i
+                class="left material-icons">arrow_back</i>Volver</a>
+            {% endif %}
+        </div>  
+    </div>
+</div>
+
+<!-- FORM -->
+<section>
+    <div class="container">
+        <div class="row">
+
+            <div class="col s12">
+                <p class="hide-on-med-and-down">&nbsp;<br></p>
+                <h1 class="h1-size white-text uppercase-font no-margin-bottom">Calculadora: Buen Precio</h1>
+                <h2 class="h3-size grey-text no-margin-top">Herramienta que ayuda a elegir un precio de venta adecuado para algún producto teniendo en cuenta su costo y su condición.</h2>
+            </div>
+
+            <div class="col l12 m12 s12">
+                <div class="card background-2f border-radius-10">
+
+                    <form method="post" action="{{url_for('product.tools_nice_price')}}">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" value="{{int(show_all_levels)}}" id="show_all" name="show_all">
+
+                        <div class="card-content">
+                            <!-- FORM -->
+                            <div class="row">
+                                <!-- PURCHASE PRICE -->
+                                <div class="input-field col l4 m4 s12">
+                                    {{ form.cost.label }}
+                                    {{ form.cost }} <br />
+                                    {% for error in form.cost.errors %}
+                                    <span style="color:red;">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+              
+                                <!-- EXTRA COST -->
+                                <div class="input-field col l4 m4 s12">
+                                    {{ form.extra_cost.label }}
+                                    {{ form.extra_cost }} <br />
+                                    {% for error in form.extra_cost.errors %}
+                                    <span style="color:red;">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+
+                                <!-- SALE PRICE -->
+                                <div class="input-field col l4 m4 s12">
+                                    {{ form.price.label }}
+                                    {{ form.price }} <br />
+                                    {% for error in form.price.errors %}
+                                    <span style="color:red;">{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                    
+                                <!-- CONDITION -->
+                                <div class="col l6 m6 s12">
+                                    <label for="new">Condición:</label>
+                                    <p>
+                                        <label>
+                                            <input id="new1" name="new" type="radio" class="with-gap" value="1" {% if form.new.data == "1"%}checked="checked"{% endif %}>
+                                            <span>Nuevo</span> 
+                                        </label>
+                                        <label>
+                                            <input id="new2" name="new" type="radio" class="with-gap" value="0" {% if form.new.data == "0"%}checked="checked"{% endif %}>
+                                            <span>Usado</span> 
+                                        </label>
+                                    </p>
+                                </div>
+                            </div>                            
+                        </div>
+
+                        <div class="card-action">
+                            <!-- FORM SUBMITS BUTTONS -->
+                            <div class="row center no-margin-bottom">                   
+                                <div class="col l12 m12 s12 right-align">
+                                    {{ form.submit(class="btn btn-save btn-flat") }}
+                                </div>                       
+                            </div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+
+            <!--<div class="col l3 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+
+                    <div class="card-content grey-text info-card" id="card_help">
+                        <span class="card-title uppercase-font center">Ayuda</span>
+                        <p>
+                            <strong>Uso:</strong>
+                            <br>
+                            &#9679; Esta herramienta funciona con costos desde $1 hasta $100.000.
+                            <br>
+                            &#9679; Los productos con costos demasiado elevados aún no poseen soporte completo por esta misma.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="hide-on-large-only">
+                <div class="fixed-action-btn">
+                    <a class="btn-floating btn-large" href="#card_help">
+                        <i class="large material-icons blue-text">help_outline</i>
+                    </a>
+                </div>
+            </div>-->
+
+        </div>
+    </div>
+    
+</section>
+
+<!-- RESULTS -->
+{% if result %}
+<section>
+    <div class="container white-text">
+
+        <div class="row">
+
+            <div class="col l12 m12 s12">
+                <p class="hide-on-med-and-down">&nbsp;<br></p>
+                <h2 class="h1-size white-text uppercase-font">Resultados</h1>
+            </div>
+
+            <div class="col l12 m12 s12">
+
+                <!-- OPTION BUTTONS -->
+                <div class="left-align">
+                    {% if show_all_levels %}
+                    <a href="#show_all_results" class="btn btn-secondary margin-bottom-10" id="btn_show_all_results">
+                        <i class="left material-icons">visibility_off</i>
+                        Ocultar resultados irrelevantes
+                    </a>
+
+                    {% else %}
+                    <a href="#show_all_results" class="btn btn-secondary margin-bottom-10" id="btn_show_all_results">
+                        <i class="left material-icons">visibility</i>Ver todos los resultados
+                    </a>
+                    
+                    {% endif %}
+                    
+                    <a href="#chartContainer" class="btn btn-secondary margin-bottom-10" id="btn_show_chart">
+                        <i class="left material-icons">bar_chart</i>
+                        Generar Gráfico
+                    </a>
+                </div>
+
+                <ul class="collapsible expandable">
+                    {% if is_user_price %}
+                    <li class="active">
+                        <div class="collapsible-header">
+
+                            <div class="row full-width no-margin-bottom">
+                                <div class="col l10 m10 s9">
+                                    <i class="left material-icons">paid</i>Tu Precio
+                                    
+                                </div>
+                                <div class="col l2 m2 s3 right-align">
+                                    <i class="material-icons expand-more-icon">expand_more</i>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="collapsible-body">
+                            <table>
+                                <div class="row no-margin">
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Precio: <span class="right normal-font">${{f(price)}}</span></p>
+                                    </div>
+                                    
+                                    <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Costo Total: <span class="right normal-font">${{f(rcost)}}</span></p>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+                            
+                            
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Ganancia (por Persona): <span class="right normal-font">${{f(int(round((gain / profiles_number))))}}</span></p>
+                                    </div>
+                                    
+                                    <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Ganancia Total: <span class="right normal-font">${{f(gain)}}</span></p>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+                                    
+                                    <div class="hide-on-large-only"> {# Para Mobiles y Tablets#}
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">% de Ganancia (Gan/Cos): <span class="right normal-font">{{f(percent(gain, rcost))}}%</span></p>
+                                        </div>
+                                        
+                                        <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">% de Ganancia (Gan/Pre): <span class="right normal-font">{{f(percent(gain, price))}}%</span></p>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="hide-on-med-and-down"> {# Para Desktop#}
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Porcentaje de Ganancia (Gan/Cos): <span class="right normal-font">{{f(percent(gain, rcost))}}%</span></p>
+                                        </div>
+                                        
+                                        <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Porcentaje de Ganancia (Gan/Pre): <span class="right normal-font">{{f(percent(gain, price))}}%</span></p>
+                                        </div>
+                            
+                                    </div>
+
+                                    <div class="divider divider-custom"></div>
+                            
+                            
+                                    <div class="col l12 m12 s12">
+                                        {% set progress = percent(gain, price) %}
+                                        {% set progress_color = get_progress_color(100-progress, value_red=30, value_orange=45, value_green=60, default=get_color(progress, "blue", "indigo", divider=25)) %}
+                                        <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                            data-tooltip='{{tooltip_percent(progress, "Ganancia", "Costo", classes1="green-text", classes2="red-text", title="Ganancia", helper_text="Porcentaje de Ganancia (Gan/Pre)")}}'>
+                                            <div class="determinate {{progress_color}}" style="width: {{progress}}%">
+                                                <span class="progress-span">Ganancia {{f(int(progress))}}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Precio Crítica: <span class="right normal-font">{{nice_price.get_price_status_as_word(price, rcost, new)}}</span></p>
+                                    </div>
+                                    
+                                    <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                    <div class="col l6 m6 s12">
+                                        {% set progress = nice_price.get_price_status_percent(price, rcost, new) %}
+                                        {% set progress_color = nice_price.get_price_status_color(price, rcost, new) %}
+                                        <div class="progress {{progress_color}} lighten-4 progress-bar">
+                                            <div class="determinate {{progress_color}}" style="width: {{progress}}%">
+                                                <span class="progress-span">${{price}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+
+                                </div>
+
+                            </table>
+
+                        </div>
+                    </li>
+                    {% endif %}
+
+                    {% if (not is_user_price) or (show_all_levels) %}
+                    <li active="true">
+                        <div class="collapsible-header">
+                        
+                            <div class="row full-width no-margin-bottom">
+                                <div class="col l10 m10 s9">
+                                    <i class="left material-icons">info_outline</i>Información de Costo
+                                    
+                                </div>
+                                <div class="col l2 m2 s3 right-align">
+                                    <i class="material-icons expand-more-icon">expand_more</i>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="collapsible-body">
+                            <table>
+                                <div class="row no-margin">
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Precio de Referencia: <span class="right normal-font">${{f(price)}}</span></p>
+                                    </div>
+                                    
+                                    <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Costo Total: <span class="right normal-font">${{f(rcost)}}</span></p>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+                            
+                            
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Costo: <span class="right normal-font">${{f(cost)}}</span></p>
+                                    </div>
+                                    
+                                    <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                    <div class="col l6 m6 s12">
+                                        <p class="bold-font">Costo Extra: <span class="right normal-font">${{f(extra_cost)}}</span></p>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+                                    
+                                    <div class="hide-on-large-only"> {# Para Mobiles y Tablets#}
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">% de Costo: <span class="right normal-font">{{f(percent(cost, rcost))}}%</span></p>
+                                        </div>
+                                        
+                                        <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">% de Costo Extra: <span class="right normal-font">{{f(percent(extra_cost, rcost))}}%</span></p>
+                                        </div>
+
+                                        <div class="divider divider-custom"></div>
+
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">% (Cos/Pre): <span class="right normal-font">{{f(percent(rcost, price))}}%</span></p>
+                                        </div>
+
+                                    </div>
+                            
+                                    <div class="hide-on-med-and-down"> {# Para Desktop#}
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Porcentaje de Costo (Cos/Tot): <span class="right normal-font">{{f(percent(cost, rcost))}}%</span></p>
+                                        </div>
+                                        
+                                        <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Porcentaje de Costo Extra (C. Ext/Tot): <span class="right normal-font">{{f(percent(extra_cost, rcost))}}%</span></p>
+                                        </div>
+
+                                        <div class="divider divider-custom"></div>
+
+                                        <div class="col l6 m6 s12">
+                                            <p class="bold-font">Porcentaje (Cos/Pre): <span class="right normal-font">{{f(percent(rcost, price))}}%</span></p>
+                                        </div>
+                            
+                                    </div>
+                                    
+                                    <div class="divider divider-custom hide-on-med-and-up"></div>
+                            
+                            
+                                    <div class="col l12 m12 s12">
+                                        {% set progress = percent(rcost, price)%}
+                                        {% set progress_color = get_progress_color(progress, value_red=30, value_orange=45, value_green=60) %}
+                                        <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                                            data-tooltip='{{tooltip_percent(progress, "Costo", "Ganancia", classes1="red-text", classes2="green-text", title="Costo", helper_text="Porcentaje de Costo (Cos/Pre)")}}'>
+                                            <div class="determinate {{progress_color}}" style="width: {{progress}}%">
+                                                <span class="progress-span">Costo {{f(int(progress))}}%</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="divider divider-custom"></div>
+                                </div>
+                            </table>
+                        </div>
+                    </li>
+                    {% endif %}
+
+                    {% set classes = {3: 'active', 4: '', 5: '', 6: '', 7: ''} %}
+                    {% set icons = {3: 'price_check', 4: 'attach_money', 5: 'warning', 6: 'highlight_off', 7: 'money_off'} %}
+                    {% for _level, _name in {3: 'Recomendado', 4: 'Aceptable', 5: 'Poco Aceptable', 6: 'No recomendado', 7: 'Muy Caro'}.items() %}
+                    <li class="{{classes[_level]}}">
+                        <div class="collapsible-header">
+
+                            <div class="row full-width no-margin-bottom">
+                                <div class="col l10 m10 s9">
+                                    <i class="left material-icons">{{icons[_level]}}</i>{{_name}}
+                                    
+                                </div>
+                                <div class="col l2 m2 s3 right-align">
+                                    <i class="material-icons expand-more-icon">expand_more</i>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="collapsible-body">
+                            <table>
+                            {{ recomendation(level=_level, title=_name) }}
+                            </table>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- TODOS LOS RESULTADOS -->
+            <div id="show_all_results" class="col s12 l12 m12 {% if not show_all_levels %}no-display{% endif %}" >
+                
+                <div class="col l12 m12 s12">
+                    <p class="show-on-medium-and-down">&nbsp;<br></p>
+                    <div class="row no-margin">
+                        <div class="col l7 m7 s12">
+                            <h2 class="h1-size white-text uppercase-font no-margin-top">Más Resultados</h2>
+                        </div>
+
+                        <div class="col l5 m5 s12 right-align">
+                            <a href="#show_all_results" class="btn btn-secondary" id="btn_hide_all_results">
+                                <i class="left material-icons">visibility_off</i>
+                                Ocultar resultados
+                            </a>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <ul class="collapsible expandable">
+                    {% set icons = {0: 'local_offer', 1: 'paid', 2: 'attach_money', 8: 'money_off', 9: 'highlight_off'} %}
+                    {% for _level, _name in {0: 'Demasiado Barato', 1: 'Muy Barato', 2: 'Barato', 8: 'Demasiado Caro', 9: 'Extremo'}.items() %}
+                        <li>
+                            <div class="collapsible-header">
+                            
+                                <div class="row full-width no-margin-bottom">
+                                    <div class="col l10 m10 s9">
+                                        <i class="left material-icons">{{icons[_level]}}</i>{{_name}}
+                                        
+                                    </div>
+                                    <div class="col l2 m2 s3 right-align">
+                                        <i class="material-icons expand-more-icon">expand_more</i>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="collapsible-body">
+                                <table>
+                                {{ recomendation(level=_level, title=_name) }}
+                                </table>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+
+        <div class="chartData">
+            <input type="hidden" id="chart_cost" name="cost" value="{{cost}}">
+            <input type="hidden" id="chart_extracost" name="extracost" value="{{extra_cost}}">
+            <input type="hidden" id="chart_price" name="price" value="{{price}}">
+            <input type="hidden" id="chart_new" name="new" value="{{int(new)}}">
+            <input type="hidden" id="chart_is_user_price" name="is_user_price" value="{{int(is_user_price)}}">
+        </div>
+
+        <div>
+            <div id="chartContainer" style="height: 600px; width: 100%;" class="no-display margin-bottom-10"></div>
+        </div>
+        
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+{% if offline %}
+<!-- WARNING: This is load from local server -->
+<!-- Offline Mode: True -->
+<script src="{{url_for('static', filename='offline/js/canvasjs.min.js')}}"></script>
+{% else %}
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script> 
+{% endif %}
+
+<script src="{{url_for('static', filename='js/admin/tools/charts.js')}}"></script>
+{% endblock %}
+
+{% macro recomendation(level, title) %}
+<div class="col s12 m12 l12 white-text">
+    <div class="row no-margin">
+        <div class="col l6 m6 s12">
+            <p class="bold-font">Precio: <span class="right normal-font">${{f(nice_price.get_price(rcost, new, level=level))}}</span></p>
+        </div>
+        
+        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+        <div class="col l6 m6 s12">
+            <p class="bold-font">Diferencia: <span class="right normal-font">${{f(nice_price.get_price_difference(price, rcost, new, level=level))}}</span></p>
+        </div>
+
+        <div class="divider divider-custom"></div>
+
+
+        <div class="col l6 m6 s12">
+            <p class="bold-font">Ganancia (por Persona): <span class="right normal-font">${{f(nice_price.get_profile_gain(profiles_number, rcost, new, level=level))}}</span></p>
+        </div>
+        
+        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+        <div class="col l6 m6 s12">
+            <p class="bold-font">Ganancia Total: <span class="right normal-font">${{f(nice_price.get_gain(rcost, new, level=level))}}</span></p>
+        </div>
+
+        <div class="divider divider-custom"></div>
+        
+        <div class="hide-on-large-only"> {# Para Mobiles y Tablets#}
+            <div class="col l6 m6 s12">
+                <p class="bold-font">% de Ganancia (Gan/Cos): <span class="right normal-font">{{f(nice_price.get_percent_gain_by_cost(rcost, new, level=level))}}%</span></p>
+            </div>
+            
+            <div class="divider divider-custom hide-on-med-and-up"></div>
+
+            <div class="col l6 m6 s12">
+                <p class="bold-font">% de Ganancia (Gan/Pre): <span class="right normal-font">{{f(nice_price.get_percent_gain(rcost, new, level=level))}}%</span></p>
+            </div>
+            
+        </div>
+
+        <div class="hide-on-med-and-down"> {# Para Desktop#}
+            <div class="col l6 m6 s12">
+                <p class="bold-font">Porcentaje de Ganancia (Gan/Cos): <span class="right normal-font">{{f(nice_price.get_percent_gain_by_cost(rcost, new, level=level))}}%</span></p>
+            </div>
+            
+            <div class="divider divider-custom hide-on-med-and-up"></div>
+
+            <div class="col l6 m6 s12">
+                <p class="bold-font">Porcentaje de Ganancia (Gan/Pre): <span class="right normal-font">{{f(nice_price.get_percent_gain(rcost, new, level=level))}}%</span></p>
+            </div>
+
+        </div>
+
+        <div class="divider divider-custom"></div>
+
+
+        <div class="col l12 m12 s12">
+            {% set progress = nice_price.get_percent_gain(rcost, new, level=level) %}
+            {% set progress_color = get_progress_color(100-progress, value_red=30, value_orange=45, value_green=60, default=get_color(progress, "blue", "indigo", divider=25)) %}
+            <div class="progress {{progress_color}} lighten-4 progress-bar tooltipped-click" data-position="top"
+                data-tooltip='{{tooltip_percent(progress, "Ganancia", "Costo", classes1="green-text", classes2="red-text", title="Ganancia", helper_text="Porcentaje de Ganancia (Gan/Pre)")}}'>
+                <div class="determinate {{progress_color}}" style="width: {{abs(progress)}}%">
+                    <span class="progress-span">Ganancia {{f(int(progress))}}%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="divider divider-custom"></div>
+    </div>
+</div>
+{% endmacro %}
+

@@ -1,0 +1,167 @@
+{% extends 'layout.html' %}
+
+{% block css%}
+<link rel="stylesheet" href=" {{ url_for('static', filename='css/admin/workday/list.css') }} ">
+<link rel="stylesheet" href=" {{ url_for('static', filename='css/libs/list.css') }} ">
+{% endblock %}
+
+{% block title %} Lista de Días de Trabajo {% endblock title %}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('public.home')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Add #}
+<li><a href="{{url_for('client.add')}}"><i class="left material-icons">person_add</i>Agregar</a></li>
+{% endblock nav_options %}
+
+<!-- SEARCH -->
+{% block search_nav_button %}{% endblock search_nav_button %}
+
+
+{% block content %}
+<section>
+    <div class="container">
+
+        <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+            {# Back #}
+            <div class="col l4 m4 s12">
+                <a href="{{url_for('public.home')}}" class="btn btn-block"><i class="left material-icons">arrow_back</i>Volver</a>
+            </div>
+
+            {# Agregar #}
+            <div class="col l4 m4 s12">
+                <a href="{{url_for('client.add')}}" class="btn btn-block"><i class="left material-icons">person_add</i>Agregar</a>
+            </div>
+        </div>
+
+        <!-- Date List-->
+        <div class="row">
+
+            <div class="col l12 m12 s12">
+                <p class="hide-on-med-and-down">&nbsp;<br></p>
+
+                <div class="row">
+                    <div class="col l9 m12 s12  margin-top-20">
+                        <h1 class="h1-size white-text uppercase-font no-margin">Lista de Clientes</h1>
+                    </div>
+                    <div class="col l3 m12 s12  margin-top-20 hide-on-med-and-down">
+                        <a href="#!" id="fast_search_switch" class="waves-effect waves-light btn btn-flat btn-secondary right margin-left-10 tooltipped"
+                            data-position="bottom" data-tooltip="Buscar">
+                            <i class="material-icons">search</i></a>
+
+                        {% if show_search or search %}
+                        <a href="{{url_for('workday.view_list')}}" class="waves-effect waves-light btn btn-flat btn-secondary modal-trigger right margin-left-10 tooltipped"
+                            data-position="bottom" data-tooltip="Finalizar búsqueda">
+                            <i class="material-icons">close</i></a>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                {% if search %}
+                <p class="grey-text">Resultados de la búsqueda: <span id="searchNumberInfo">{{search_data.results}}</span> / {{search_data.total}} coincidencias</p>
+                {% endif %}
+            </div>
+
+            <div class="col l12 m12 s12">
+
+                <!-- FastSearch -->
+                <div class="{% if not show_search or search %}no-display{% endif %}" id="fast_search_section">
+                    <div class="card background-2f border-radius-10">
+                        <div class="card-content">
+                            <div class="row no-margin">
+                                <div class="col s9 m10 l11">
+                                    <input  class="white-text" type="text" id="fast_search_input" placeholder="Búsqueda rápida">
+                                </div>
+                                <div class="col s2 m1 l1">
+                                    <a href="#!" class="btn btn-flat btn-secondary center tooltipped" id="fast_search_mode" data-mode="all" data-position="bottom" data-tooltip="Buscar en todos">
+                                        <i class="tiny material-icons white-text center">filter_9_plus</i>    
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="card background-2f border-radius-10">
+                    <div class="card-content">
+
+                        <table id="sorted_table">
+                            <thead> 
+                                <tr class="grey-text">
+                                    <th data-type="name">Nombre <i class="material-icons tiny">arrow_drop_up</i></th>
+                                    <th data-type="price" class="center">Compras <i class="material-icons tiny"></i></th>
+                                    <th data-type="name" class="center no-display">Contacto<i class="material-icons tiny"></i></th>
+                                    <th class="center hide-on-med-and-down">Opciones <i class="material-icons tiny"></i></th>
+                                </tr>
+                            </thead>
+                        
+                            <tbody>
+                                {% for client in clients %}
+                                <tr class="white-text">
+
+                                    <td width="50%">
+                                        <a class="white-text btn-open-in-new" href="{{url_for('client.details', token=client.token, resume='true')}}">
+                                            <i class="tiny left material-icons hide-on-med-and-down">open_in_new</i>
+                                            {{client.name.upper()}}
+                                        </a>
+                                    </td>
+
+                                    {% set sales = client.get_mount_of_sales() %}
+                                    <td class="blue-text center">${{sales.price}}</td>
+                                    <td class="no-display">{{client.get_contact}}</td>
+                                    
+                                    <td class="row-options hide-on-med-and-down">
+                                        <div class="row no-margin">
+                                            <div class="col {% if client.can_be_deleted() %} l6 {%else%} l12 {%endif%} m12 s12">
+                                                <a href="{{url_for('client.add', token=client.token)}}" class="btn btn-flat btn-block btn-edit">
+                                                    <i class="tiny material-icons center">edit</i>
+                                                </a>
+                                            </div>
+                                            <div class="col l6 m12 s12">
+                                                {% if client.can_be_deleted() %}
+                                                <a data-url="{{url_for('client.discard', token=client.token)}}" class="btn btn-flat btn-delete">
+                                                    <i class="tiny material-icons center">delete</i>
+                                                </a>
+                                                {%endif%}
+                                            </div>                                                    
+                                            
+                                        </div>
+
+                                    </td>
+                                </tr>
+                                {%endfor%}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{# DON'T DELETE !!!! #}
+<div style="height: 100px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('client.add')}}"> <i class="large material-icons white-text">add</i></a>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/libs/sort.js') }}"></script>
+<script src="{{ url_for('static', filename='js/admin/workday/list.js') }}"></script>
+<script src="{{ url_for('static', filename='js/libs/buttons.js') }}"></script>
+{% endblock %}

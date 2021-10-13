@@ -1,0 +1,40 @@
+/* START: Dylan */
+.col-stock{
+    width: 70px;
+    max-width: 150px;
+}
+.col-price,
+.col-cost,
+.col-profit,
+.col-sell,
+.col-condition{
+    max-width: 100px;
+}
+
+table td{
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+@media screen and (min-width: 601px) {
+    .col-stock {
+        width: 120px;
+    }
+    
+    table td{
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+}
+
+@media screen and (min-width: 992px) {
+    .col-stock {
+        width: 150px;
+    }
+
+    table td{
+        padding-top: 6px;
+        padding-bottom: 6px;
+    }
+}
+/* END: Dylan */

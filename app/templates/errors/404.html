@@ -1,0 +1,17 @@
+{% extends 'errors/template-error.html' %}
+
+{% block error_code %}
+    404
+{% endblock error_code %}
+
+{% block title_description %}
+    Recurso no encontrado
+{% endblock title_description %}
+
+{% block title %}
+    <h1>Error 404: Not Found</h1>
+{% endblock title %}
+
+{% block content %}
+    <p>El recurso solicitado no existe. Verifique que todo esté escrito correctamente y vuelva a intentarlo.</p>
+{% endblock content %}

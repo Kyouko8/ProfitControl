@@ -1,0 +1,190 @@
+{% extends 'layout.html' %}
+{% from "macros.html" import tooltip_percent with context %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %} Detalle de la Venta - {{product.name}} (x{{sale.quantity}}) {%endblock%}
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('workday.details', token=workday.token)}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Edit #}
+<li><a href="{{url_for('workday.product_add', token=workday.token, list_sale_token=sale.token)}}" class=""><i class="left material-icons">edit</i>Editar</a></li>
+{# Delete #}
+<li class="divider divider-option-buttons"></li>
+<li><a data-url="{{url_for('workday.product_delete_sale', token=workday.token, list_sale_token=sale.token)}}" class="nav-btn-delete btn-delete {% if not sale.can_be_deleted() %}disabled{% endif %}"><i class="left material-icons">delete</i>Descartar Venta</a></li>
+{% endblock nav_options %}
+
+
+{% block content %}
+{#% set f = int %#}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('workday.details', token=workday.token)}}" class="btn btn-block"><i
+                    class="left material-icons">arrow_back</i>Volver</a>
+        </div>
+        {# Edit #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('workday.product_add', token=workday.token, list_sale_token=sale.token)}}" class="btn btn-block"><i
+                    class="left material-icons">edit</i>Editar</a>
+        </div>
+        {# Delete #}
+        <div class="col l4 m4 s12">
+            <a data-url="{{url_for('workday.product_delete_sale', token=workday.token, list_sale_token=sale.token)}}" class="btn btn-block btn-cancel btn-delete {% if not sale.can_be_deleted() %}disabled{% endif %}"><i
+                    class="left material-icons">delete</i>Descartar</a>
+        </div>
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="container">
+    <div class="row">
+        {% set n_profiles = max(1, len(profiles)) %}
+
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Información de la Venta</h1>
+        </div>
+    
+        <!-- GENERAL -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">{{product.name}}</span>
+
+                    <div class="row no-margin">
+                        
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Fecha: <span class="right normal-font">{{workday.get_format(" / ")}}</span></p>
+                        </div>
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Cantidad: <span class="right normal-font">{{sale.quantity}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+                        
+
+                        {% set total_price = sale.price * shopping.quantity %}
+                        <div class="col l6 m6 s6">
+                            <p class="bold-font">Precio Total: <span class="right normal-font">${{total_price}}</span></p>
+                        </div>
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        {% set total_rcost = cost.get_real_cost() * sale.quantity %}
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Costo Total: <span class="right normal-font">${{total_rcost}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+
+                        {% set total_profit = total_price - total_rcost%}
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Ganancia Total: <span class="right normal-font">${{total_profit}}</span></p>
+                        </div>
+                        <div class="divider divider-custom hide-on-med-and-up"></div>
+
+                        <div class="col l6 m6 s12">
+                            <p class="bold-font">Ganancia Total (por Persona): <span class="right normal-font">${{f((total_profit/n_profiles))}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRECIOS -->
+        <div class="col l12 m12 s12">
+            <h2 class="h2-size white-text uppercase-font">Precios de Ventas por Unidad</h2>
+            {% set color = get_color(sale.price - cost.get_price(), 'green', 'red', divider=0) %}
+            <p class="grey-text">La diferencia de precios es de <b class="{{color}}-text">${{f(sale.price - cost.get_price())}}</b>.</p>
+        </div>
+
+        <div class="col s12 m6 l6 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">Precio de Venta</span>
+
+                    <div class="row no-margin">
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Precio: <span class="right normal-font">${{sale.price}}</span></p>
+                            
+                        </div>
+                        <div class="divider divider-custom"></div>
+
+                        {% set rcost = cost.get_real_cost() %}
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Costo: <span class="right normal-font">${{rcost}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+
+                        {% set profit = sale.price - rcost%}
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Ganancia: <span class="right normal-font">${{profit}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Ganancia (por Persona): <span class="right normal-font">${{round(profit/n_profiles, 2)}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col s12 m6 l6 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">Precio del Producto</span>
+
+                    <div class="row no-margin">
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Precio: <span class="right normal-font">${{cost.get_price()}}</span></p>
+                            
+                        </div>
+                        <div class="divider divider-custom"></div>
+
+                        {% set rcost = cost.get_real_cost() %}
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Costo: <span class="right normal-font">${{rcost}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+
+                        {% set profit = cost.get_price() - rcost%}
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Ganancia: <span class="right normal-font">${{profit}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+
+                        <div class="col l12 m12 s12">
+                            <p class="bold-font">Ganancia (por Persona): <span class="right normal-font">${{round(profit/n_profiles, 2)}}</span></p>
+                        </div>
+                        <div class="divider divider-custom"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div style="margin-top: 80px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('workday.product_add', token=workday.token, list_sale_token=sale.token)}}"> <i class="large material-icons white-text edit-fab-button">edit</i></a>
+    </div>
+</div>
+{% endblock content %}

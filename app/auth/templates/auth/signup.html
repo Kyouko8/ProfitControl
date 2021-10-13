@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+
+{% block title%} Registrarse {% endblock %}
+
+{% block css%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/auth/form.css') }}">
+{% endblock %}
+
+{% block content %}
+<section>
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col l3 m12 s12"></div>
+
+            <div class="col l6 m12 s12">
+
+                <div class="card background-2f border-radius-10">
+                    <form method="post">
+                        <div class="card-content">
+                            <span class="card-title white-text uppercase-font center">Registrarse</span>
+
+                            {{form.hidden_tag()}}
+
+                            <div class="input-field">
+                                <input id="email" type="email" class="validate input" name="email" value="{{process_form_data(form.email)}}" required>
+                                <label for="email" class="label">Correo Electrónico</label>
+                                {% for error in form.email.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}
+                            </div>
+                
+                            <div class="input-field">
+                                <input id="firstname" type="text" class="validate input" name="firstname" value="{{process_form_data(form.firstname)}}" required>
+                                <label for="firstname" class="label">Nombre de Usuario</label>
+                                {% for error in form.firstname.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}                        
+                            </div>
+                
+                            <div class="input-field">
+                                <input id="lastname" type="text" class="validate input" name="lastname" value="{{process_form_data(form.lastname)}}">
+                                <label for="lastname" class="label">Apellido (opcional)</label>
+                                {% for error in form.lastname.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}                        
+                            </div>
+                
+                            <div class="input-field">
+                                <input id="password" type="password" class="validate input" name="password" minlength="8" required>
+                                <label for="password" class="label">Contraseña</label>
+                                <p class="no-margin no-padding left-align field-icon"><i class="material-icons password-visibility white-text" data-target="password">visibility</i></p>
+                                <span class="helper-text" data-error="La contraseña debe tener mínimo 8 (ocho) caracteres." data-success=""></span>
+
+                                {% for error in form.password.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}                        
+                            </div>
+                
+                            <div class="input-field">
+                                <input id="confirm" type="password" class="validate input" name="confirm" required>
+                                <label for="confirm" class="label">Confirmar Contraseña</label>
+                                <p class="no-margin no-padding left-align field-icon"><i class="material-icons password-visibility white-text" data-target="confirm">visibility</i></p>
+
+                                <!-- <span class="helper-text" data-error="La contreña no coincide." data-success=""></span> -->
+                                {% for error in form.confirm.errors %}
+                                    <p class="center-align h3-size white-text background-2f no-margin-top border-radius-10">{{error}}</p>
+                                {% endfor %}                        
+                            </div>
+                
+                            <p>
+                                <label>
+                                    <input id="remember_me" type="checkbox" class="filled-in" checked="checked" name="remember_me"  />
+                                    <span>Mantener Sesión Iniciada</span>
+                                </label>
+                            </p><br>
+                            <p>
+                                <label>
+                                    <input id="fast_log" type="checkbox" class="filled-in" checked="checked" name="fast_log"  />
+                                    <span>Mantener mi Usuario en Recientes</span>
+                                </label>
+                            </p> 
+
+                        </div>
+
+                        <div class="card-action center-align">
+                            <button type="submit" id="submit" name="submit" class="btn btn-save">Registrarse</button>
+
+                            <p class="grey-text">¿Ya tienes una cuenta? <a href="{{ url_for('auth.login', **request.args) }}" class="blue-text text-darken-2">Inicia Sesión</a></p>
+                        </div>
+                    </form>
+
+
+                </div>
+
+            </div>
+
+            <div class="col l3 m12 s12"></div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}
+
+{% block javascript%}
+<!-- <script src="{{ url_for('static', filename='js/auth/signup.js') }}"></script> -->
+{% endblock %}

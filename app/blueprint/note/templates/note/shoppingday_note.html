@@ -1,0 +1,84 @@
+{% extends 'layout.html' %}
+{% from 'macros.html' import draw_note %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/list.css') }}">
+{%endblock%}
+
+
+{% block title %} Detalle de la Nota - {{shoppingday.get_format()}} {%endblock%}
+
+
+{% block sidenav_button %}
+<ul class="left hide-on-large-only">
+    <li><a href="{{url_for('note.view_list')}}" class="nav-back-button"><i class="material-icons">arrow_back</i></a></li>
+</ul>
+{% endblock sidenav_button %}
+
+{% block nav_options %}
+<!-- Nav Options -->
+{# Edit #}
+<li><a href="{{url_for('shoppingday.details', token=shoppingday.token)}}"><i class="left material-icons">today</i>Día de Compras</a></li>
+
+{% endblock nav_options %}
+
+{% block content %}
+{#% set f = int %#}
+<!-- OPTION BUTTONS -->
+<div class="container">
+
+    <div class="row option-buttons on-top hide-on-med-and-down" id="option_buttons">
+        {# Back #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('note.view_list')}}" class="btn btn-block"><i
+                    class="left material-icons">arrow_back</i>Volver</a>
+        </div>
+
+        {# Edit #}
+        <div class="col l4 m4 s12">
+            <a href="{{url_for('shoppingday.details', token=shoppingday.token)}}" class="btn btn-block"><i
+                    class="left material-icons">today</i>Día de Compras</a>
+        </div>
+
+    </div>
+</div>
+
+<!-- TITLE -->
+<div class="container">
+    <div class="row">
+        <div class="col l12 m12 s12">
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <p class="hide-on-med-and-down">&nbsp;<br></p>
+            <h1 class="h1-size white-text uppercase-font">Ver nota del día de compras:</h1>
+        </div>
+    
+        <!-- GENERAL -->
+        <div class="col s12 m12 l12 white-text">
+            <div class="card background-2f border-radius-10 hoverable">
+                <div class="card-content white-text">
+                    <span class="card-title">{{shoppingday.get_format()}}</span>
+
+                    <div class="row no-margin">
+                        {% if shoppingday.note is none %}
+                        <div class="col l12 m12 s12">
+                            <p class="grey-text">Este día de compras no tiene notas.</p>
+                        </div>
+                        <div class="divider divider-custom hide-on-small-only"></div> 
+                        {% else %}
+                        {{ draw_note(shoppingday.note.splitlines()) }}
+                        {% endif %}
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div style="margin-top: 80px;"></div>
+<div {% if not current_user.get_config_force('show_btn_floating', 0).as_int() %}class="hide-on-large-only"{% endif %}>
+    <div class="fixed-action-btn">
+        <a class="btn-floating blue btn-large" href="{{url_for('shoppingday.details', token=shoppingday.token)}}#s-note"> <i class="large material-icons white-text">today</i></a>
+    </div>
+</div>
+{% endblock content %}
