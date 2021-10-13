@@ -13,13 +13,13 @@ ProfitControl allows you to manage:
 * Shopping.
 * Profits & Expenses.
 
-ProfitControl has too a tool to get the suitable price for a product called **NicePrice**. [*How it works?*](https://LINKHERE.com)
+ProfitControl has too a tool to get the suitable price for a product called **NicePrice**.
 
 ## Products
 ProfitControl has **Stock Control**.\
 Allows you to note the **cost** and the **sale price** for each product, to can calculate the profit.
 
-## Clientes
+## Clients
 *Still in development.*
 
 ## Sales
