@@ -1,5 +1,19 @@
-.old_files/
-old_databases/
+# Data Base Information
 dia/
 app/.data
+
+# Todo File
 app/todo.txt
+
+# Virtual Env
+.venv/
+
+# Python Files
+*.pyc
+__pycache__/
+
+# Project Old Files
+.old_files/
+old_databases/
+*.old
+_/
