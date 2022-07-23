@@ -1,0 +1,88 @@
+{% extends 'layout.html' %}
+
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col l3 m12 s12"></div>
+
+        <div class="col l6 m12 s12">
+
+            <div class="card border-radius-20 background-2f">
+
+                <div class="card-content">
+                    <p class="left-align h1-size white-text">Nuestros Planes</p>
+                    
+                    <div class="card border-radius-20 background-35">
+                        <div class="card-content">
+                            <p class="center-align bold-font white-text h2-size uppercase-font">Standard</p>
+
+                            <ul class="grey-text text-lighten-2">
+                                <li><i class="material-icons left">check</i>Hasta <strong>3 perfiles</strong></li>
+                                <br>
+                                <li><i class="material-icons left">check</i><strong>Acceso total</strong> de las secciones</li>
+                                <br>
+                                <li><i class="material-icons left">check</i><strong>Herramientas de control</strong> para tus ganancias</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form action="{{ url_for('payment.create_session') }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="row">
+                            <div class="col s6">
+                                <div class="card border-radius-20 background-35">
+                                    <div class="card-content">
+                                        <p>
+                                            <label>
+                                              <input name="payment_freq" type="radio" checked id="payment_month_freq_btn"/>
+                                              <span>Mensual</span>
+                                            </label>
+                                        </p>
+                                        <p class="bold-font white-text h2-size">$ 2.99</p>
+                                        <p class="grey-text">Paga por mes, cancela cuando quieras.</p>
+                                    </div>
+                                </div>
+                            </div>
+<!-- 
+                            <div class="col s6">
+                                <div class="card border-radius-20 background-35">
+                                    <div class="card-content">
+                                        <p>
+                                            <label>
+                                              <input name="payment_freq" type="radio" id="payment_year_freq_btn" />
+                                              <span>Anual</span>
+                                            </label>
+                                        </p>
+                                        <p class="bold-font white-text h2-size">$ 30.00</p>
+                                        <p class="grey-text">Paga un año completo.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col s6"></div>
+                            <div class="col s6 no-display" id="year_plan_message">
+                                <p class="grey-text">El plan anual se debita en 12 pagos de $ 2.50 mensuales</p>
+                            </div> -->
+                            
+                        </div>
+                        
+                        <div class="center">
+                            <button class="btn border-radius-10 purple">Suscribirse Ahora</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col l3 m12 s12"></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script src="{{ url_for('static', filename='js/payment/card.js') }}"></script>
+{%endblock%}

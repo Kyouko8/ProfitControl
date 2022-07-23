@@ -7,6 +7,7 @@ app/todo.txt
 
 # Virtual Env
 .venv/
+venv/
 
 # Python Files
 *.pyc

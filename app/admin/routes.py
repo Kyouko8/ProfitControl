@@ -5,11 +5,17 @@ from flask_login import login_required, logout_user, current_user
 
 from app.auth.models import User
 
+from app.utils.auth import suscription_required
+
 from . import admin_bp
 from .forms import ChangeEmailUserForm, ChangeNameUserForm, ChangePasswordUserForm
 
 logger = logging.getLogger(__name__)
 
+@admin_bp.before_request
+@suscription_required
+def before_request():
+    pass
 
 @admin_bp.route("/index.html")
 def index():

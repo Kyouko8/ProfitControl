@@ -9,11 +9,14 @@ from flask import render_template, redirect, url_for, request
 from flask_login import current_user, login_required
 
 
+
 from . import public_bp
 from app.models import Product
 from app import offline, VERSION
 
 logger = logging.getLogger(__name__)
+
+
 
 @public_bp.app_context_processor
 def functions():
@@ -51,15 +54,7 @@ def functions():
 
 @public_bp.route("/")
 @public_bp.route("/index.html")
-def index():
-    if current_user.is_authenticated:
-        return redirect(url_for("public.home"))
-
-
-    # device = "mobile"
-    # if request.user_agent.platform.lower() in ("windows", "mac"):
-    #     device = "desktop"
-    
+def index():    
     return render_template(f"public/index.html")
 
 @public_bp.route("/home/")

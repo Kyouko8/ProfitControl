@@ -6,9 +6,61 @@ from sqlalchemy.sql import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db
-from app.constants import COLUMN, INTEGER, STRING, DATETIME
+from app.constants import COLUMN, INTEGER, STRING, DATETIME, BOOLEAN
 from app.models import UserConfig
 
+class UserSubscription(db.Model):
+    __tablename__ = "user_subscription"
+
+    id = db.Column(db.Integer, primary_key=True)
+    token = COLUMN(STRING(200), unique=True, nullable=False)
+    id_user = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    external_id = db.Column(db.String, unique=True)
+    created_at = db.Column(DATETIME, default=func.now())
+    updated_at = db.Column(DATETIME, default=func.now(), onupdate=func.now())
+
+    def save(self):
+        db.session.add(self)
+        if not self.token:
+            self.token = self._generate_token()
+
+        while self._exists_token(self.token):
+            self.token = self._generate_token()
+
+        try:
+            db.session.commit()
+
+        except IntegrityError:
+            db.session.rollback()
+
+    def _exists_token(self, token):
+        if token is None:
+            raise ValueError("Invalid Token.")
+
+        user = UserSubscription.get_by_token(token)
+
+        if user is None:
+            return False
+
+        elif user.id == self.id:
+            return False
+
+        return True
+
+    def _generate_token(self):
+        return secrets.token_hex(12)
+
+    @staticmethod
+    def get_by_token(token):
+        return UserSubscription.query.filter_by(token=token).first()
+
+    @staticmethod
+    def get_by_external_id(external_id):
+        return UserSubscription.query.filter_by(external_id=external_id).first()
+
+    @staticmethod
+    def get_by_user(id_user):
+        return UserSubscription.query.filter_by(id_user=id_user).first()
 
 class User(db.Model, UserMixin):
     __tablename__ = "user"
@@ -19,6 +71,7 @@ class User(db.Model, UserMixin):
     password = COLUMN(STRING(400), unique=True, nullable=False)
     token = COLUMN(STRING(200), unique=True, nullable=False)
     creation_date = COLUMN(DATETIME, nullable=False, server_default=func.now())
+    suscription_active = COLUMN(BOOLEAN, default=False)
 
     def __repr__(self):
         return f"<User {self.id}:{self.email} with token {self.token}>"
@@ -85,6 +138,9 @@ class User(db.Model, UserMixin):
             return self.creation_date.strftime(f"%d{symbol}%m{symbol}%Y %H:%M")
 
         return self.creation_date.strftime(f"%d{symbol}%m{symbol}%Y")
+
+    def get_subscription(self) -> UserSubscription:
+        return UserSubscription.get_by_user(self.id)
 
     @staticmethod
     def get_by_email(email):
