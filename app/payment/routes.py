@@ -24,7 +24,7 @@ def create_session():
     session = stripe.checkout.Session.create(
         line_items=[
             {
-                "price": "price_1LNPcmGR4goX6nqtxYoxoHW8",
+                "price": "price_1LPAGIGR4goX6nqtG15KmUtH",
                 "quantity": 1,
             }
         ],
