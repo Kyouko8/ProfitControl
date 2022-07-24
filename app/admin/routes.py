@@ -13,10 +13,11 @@ from .forms import ChangeEmailUserForm, ChangeNameUserForm, ChangePasswordUserFo
 logger = logging.getLogger(__name__)
 
 
-@admin_bp.route("/index.html")
+@admin_bp.route("/")
+@admin_bp.route("/user")
+@login_required
 def index():
-    return render_template("admin/index.html")
-
+    return redirect(url_for("admin.user_details"))
 
 @admin_bp.route("/user/details/")
 @login_required
