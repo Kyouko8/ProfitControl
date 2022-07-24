@@ -14,12 +14,12 @@ class Production(Config):
 	PATH = "/var/www/profitcontrol/ProfitControl"
 	DEBUG = False
 	SQLALCHEMY_DATABASE_URI = None
-	SECRET_KEY = os.environ.get('SECRET_KEY')
+	SECRET_KEY = "HEzjUKv1Ftg01Nz6nqHZcgiuPDQcikISCA0smTk6ZgBLljCZClldfdZw-KTdnkra0ea1O1aBHSbgu0ZWTM1I9w"#os.environ.get('SECRET_KEY')
 
 	SQLALCHEMY_DATABASE_URI = f"sqlite:///{PATH}/app/.database.sqlite3"
 
-	STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
-	STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
+	STRIPE_WEBHOOK_SECRET = "whsec_zfZOhz6CQLvQeB0bEfi4OCjLMok5SfXF"#os.environ.get('STRIPE_WEBHOOK_SECRET')
+	STRIPE_API_KEY = "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"#os.environ.get('STRIPE_API_KEY')
 
 	DOWNLOAD_FOLDER = f'{PATH}/download/files'
 	UPLOAD_FOLDER = f'{PATH}/upload/files'
