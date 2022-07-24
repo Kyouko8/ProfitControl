@@ -17,9 +17,9 @@ class Production(Config):
 	
 	SQLALCHEMY_DATABASE_URI = f"sqlite:///{PATH}/app/.database.sqlite3"
 
-	# STRIPE_WEBHOOK_SECRET = os.environ.get('PC_STRIPE_WEBHOOK_SECRET')
-	# STRIPE_API_KEY = os.environ.get('PC_STRIPE_API_KEY')
-	# SECRET_KEY = os.environ.get('PC_SECRET_KEY')
+	STRIPE_WEBHOOK_SECRET = os.environ.get('PC_STRIPE_WEBHOOK_SECRET')
+	STRIPE_API_KEY = os.environ.get('PC_STRIPE_API_KEY')
+	SECRET_KEY = os.environ.get('PC_SECRET_KEY')
 
 	DOWNLOAD_FOLDER = f'{PATH}/download/files'
 	UPLOAD_FOLDER = f'{PATH}/upload/files'
