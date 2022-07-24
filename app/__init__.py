@@ -5,7 +5,7 @@ from flask import Flask, render_template
 from flask_htmlmin import HTMLMIN
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFProtect
+from flask_wtf import CSRFProtect
 from werkzeug.exceptions import HTTPException
 
 from .instance import configuration
