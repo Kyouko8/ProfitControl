@@ -20,7 +20,7 @@ def _get_user_list(cookie_list):
     user_list = []
     for token in tuple(cookie_list):
         _user = User.get_by_token(token)
-        can_log_fast = _user.get_config_force("can_log_fast", 1).as_int()
+        can_log_fast = None if not _user else _user.get_config_force("can_log_fast", 1).as_int()
         if not can_log_fast:
             cookie_list.remove(token)
             continue

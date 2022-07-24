@@ -12,10 +12,6 @@ from .forms import ChangeEmailUserForm, ChangeNameUserForm, ChangePasswordUserFo
 
 logger = logging.getLogger(__name__)
 
-@admin_bp.before_request
-@suscription_required
-def before_request():
-    pass
 
 @admin_bp.route("/index.html")
 def index():
