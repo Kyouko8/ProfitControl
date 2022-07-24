@@ -1,12 +1,14 @@
 """API routes"""
-import logging, time
-from flask import render_template, make_response, url_for, request
+import logging
+import time
+
+from app.models.models import (Client, ClientSale, ListSales, ListShopping,
+                               Product, ShoppingDay, UserConfig, WorkDay)
+from app.utils.functions import nice_price
+from flask import make_response, render_template, request, url_for
 from flask_login import current_user, login_required
 
-from . import api_bp # url_prefix = "/api"
-
-from app.models import Product, ListSales, WorkDay, ListShopping, ShoppingDay, UserConfig, Client, ClientSale
-from app.functions import nice_price
+from . import api_bp  # url_prefix = "/api"
 
 logger = logging.getLogger(__name__)
 

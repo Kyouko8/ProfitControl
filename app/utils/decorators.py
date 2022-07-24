@@ -2,7 +2,7 @@ from functools import wraps
 from flask import redirect, url_for, flash
 from flask_login import current_user
 
-from .models import Profile
+from app.models.models import Profile
 
 
 def profile_active_required(f):

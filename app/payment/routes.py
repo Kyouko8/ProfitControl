@@ -1,11 +1,9 @@
 """Public routes"""
-import datetime
 import logging
-from pickle import FALSE
 
 from app import csrf, db, stripe
 from app.auth.models import User, UserSubscription
-from flask import (abort, current_app, flash, make_response, redirect,
+from flask import (abort, current_app, flash, redirect,
                    render_template, request, url_for)
 from flask_login import current_user, login_required
 
@@ -101,17 +99,23 @@ def manage_suscription():
         flash("Parece que no tienes una suscripción activa", "warning")
         return redirect(url_for("payment.card"))
 
-
     checkout_session = stripe.checkout.Session.retrieve(
         current_user.get_subscription().token
     )
 
     return_url = url_for("public.home", _external=True)
 
-    portalSession = stripe.billing_portal.Session.create(
-        customer=checkout_session.customer,
-        return_url=return_url,
-    )
+    try:
+        portalSession = stripe.billing_portal.Session.create(
+            customer=checkout_session.customer,
+            return_url=return_url,
+        )
+
+    except Exception:
+        flash("Hubo un error con tu suscripción", "danger")
+        UserSubscription.get_by_token(current_user.get_subscription().token).delete()
+        db.session.commit()
+        return redirect(url_for("payment.card"))
 
     return redirect(portalSession.url, code=303)
     

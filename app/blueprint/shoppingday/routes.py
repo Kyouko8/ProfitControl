@@ -1,18 +1,20 @@
 """ShoppingDay routes"""
+import datetime
 import logging
 import math
 import random
-import datetime
-from flask import render_template, request, redirect, abort, url_for, flash
+
+from app.models.models import (GroupShopping, ListShopping, Product, Profile,
+                               ShoppingDay)
+from app.utils.decorators import profile_active_required
+from app.utils.functions import (analyze_int_fields, analyze_str_fields,
+                                 calculate)
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-
 from . import shoppingday_bp
-from .forms import AddShoppingDayForm, AddShoppingDayProductForm, SearchShoppingDayForm, NoteShoppingDayForm
-
-from app.models import Product, ShoppingDay, ListShopping, Profile, GroupShopping
-from app.functions import calculate, analyze_int_fields, analyze_str_fields
-from app.decorators import profile_active_required
+from .forms import (AddShoppingDayForm, AddShoppingDayProductForm,
+                    NoteShoppingDayForm, SearchShoppingDayForm)
 
 logger = logging.getLogger(__name__)
 

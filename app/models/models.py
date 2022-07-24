@@ -9,8 +9,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import func
 
 from app import db
-from .constants import COLUMN, INTEGER, FLOAT, STRING, BOOLEAN, DATETIME, TEXT, FK, ModelSaveDelete
-from .functions import nice_price, round_price, get_day_name
+from app.utils.constants import COLUMN, INTEGER, FLOAT, STRING, BOOLEAN, DATETIME, TEXT, FK, ModelSaveDelete
+from app.utils.functions import nice_price, round_price, get_day_name
 
 class Profile(db.Model, ModelSaveDelete):
     __tablename__ = "profile"

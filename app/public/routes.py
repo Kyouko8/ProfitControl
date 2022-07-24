@@ -1,22 +1,23 @@
 """Public routes"""
+import datetime
 import logging
 import random
-import datetime
 
-from app.functions import (process_form_data, add_decimal_mark, get_month_name, get_day_name, nice_price, percent,
-                            get_progress_color, get_color)
-from flask import render_template, redirect, url_for, request
+from app import VERSION
+from app.models.models import Product
+from app.utils.functions import (add_decimal_mark, get_color, get_day_name,
+                                 get_month_name, get_progress_color,
+                                 nice_price, percent, process_form_data)
+from flask import redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-
-
 from . import public_bp
-from app.models import Product
-from app import offline, VERSION
 
 logger = logging.getLogger(__name__)
 
 
+class Offline:
+    pass
 
 @public_bp.app_context_processor
 def functions():
@@ -34,8 +35,7 @@ def functions():
         'get_day_name': get_day_name,
         'percent': percent,
         'get_progress_color': get_progress_color,
-        'get_color': get_color, 
-        'offline': offline.data,
+        'get_color': get_color,
 
         'nice_price': nice_price,
 
@@ -76,12 +76,12 @@ def about():
 
 @public_bp.route("/_cfg/offline/")
 def cfg_offline():
-    offline.data = True
+    Offline().data = True
     return redirect(url_for("public.index"))
 
 @public_bp.route("/_cfg/online/")
 def cfg_online():
-    offline.data = False
+    Offline().data = False
     return redirect(url_for("public.index"))
 
 

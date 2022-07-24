@@ -1,18 +1,18 @@
 """Workday routes"""
-import logging
-import math
-import random
 import datetime
-from flask import render_template, request, redirect, abort, url_for, flash
+import logging
+
+from app.models.models import (GroupSale, ListSales, Product, Profile,
+                               Spending, WorkDay)
+from app.utils.decorators import profile_active_required
+from app.utils.functions import (analyze_int_fields, analyze_str_fields,
+                                 calculate)
+from flask import abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-
 from . import workday_bp
-from .forms import AddWorkDayForm, AddWorkDayProductForm, SearchWorkdayForm, NoteWorkDayForm
-
-from app.models import Product, WorkDay, ListSales, Spending, Profile, GroupSale
-from app.functions import calculate, analyze_int_fields, analyze_str_fields
-from app.decorators import profile_active_required
+from .forms import (AddWorkDayForm, AddWorkDayProductForm, NoteWorkDayForm,
+                    SearchWorkdayForm)
 
 logger = logging.getLogger(__name__)
 

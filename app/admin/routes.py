@@ -1,14 +1,13 @@
 """Admin routes"""
 import logging
-from flask import render_template, url_for, redirect, flash
-from flask_login import login_required, logout_user, current_user
 
 from app.auth.models import User
-
-from app.utils.auth import suscription_required
+from flask import flash, redirect, render_template, url_for
+from flask_login import current_user, login_required, logout_user
 
 from . import admin_bp
-from .forms import ChangeEmailUserForm, ChangeNameUserForm, ChangePasswordUserForm
+from .forms import (ChangeEmailUserForm, ChangeNameUserForm,
+                    ChangePasswordUserForm)
 
 logger = logging.getLogger(__name__)
 

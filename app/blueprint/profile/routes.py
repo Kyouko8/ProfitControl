@@ -2,15 +2,14 @@
 import logging
 import math
 import random
-from flask import render_template, request, redirect, abort, url_for
-from flask_login import current_user, login_required
 
+from app.models.models import Profile
+from app.utils.functions import calculate
+from flask import abort, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 
 from . import profile_bp
 from .forms import AddProfileForm
-
-from app.models import Profile
-from app.functions import calculate
 
 logger = logging.getLogger(__name__)
 

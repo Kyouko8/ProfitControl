@@ -2,16 +2,15 @@
 import logging
 import math
 import random
-from flask import render_template, request, redirect, abort, url_for
+
+from app.models.models import Cost, Product, Profile
+from app.utils.decorators import profile_active_required
+from app.utils.functions import analyze_int_fields, calculate, nice_price
+from flask import abort, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 
-
 from . import product_bp
-from .forms import AddProductForm, ToolsNicePriceForm, SearchProductForm
-
-from app.decorators import profile_active_required
-from app.models import Product, Cost, Profile
-from app.functions import calculate, nice_price, analyze_int_fields
+from .forms import AddProductForm, SearchProductForm, ToolsNicePriceForm
 
 logger = logging.getLogger(__name__)
 

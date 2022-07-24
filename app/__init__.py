@@ -1,50 +1,34 @@
 import logging
-import stripe
 
-from flask import Flask, render_template, request
+import stripe
+from flask import Flask, render_template
+from flask_htmlmin import HTMLMIN
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
-
 from werkzeug.exceptions import HTTPException
 
-try:
-    from flask_htmlmin import HTMLMIN
-except ImportError:
-    HTMLMIN = None
+from .instance import configuration
 
-VERSION = "1.2.0.6 alpha"
+VERSION = "0.7 alpha"
 
 csrf = CSRFProtect()
 login_manager = LoginManager()
 db = SQLAlchemy()
+htmlmin = HTMLMIN()
 
 stripe = stripe
 
-if HTMLMIN is not None:
-    htmlmin = HTMLMIN()
-
-class _Offline():
-    data = False
-
-offline = _Offline
-
+offline = False
 
 def configure_logging():
     FORMAT = """[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)s]    %(message)s\n"""
     logging.basicConfig(format=FORMAT)
 
 
-def create_app(minify=False, database=".data/database_1_2.sqlite3"):
+def create_app():
     app = Flask(__name__)
-    app.config['MINIFY_HTML'] = minify
-    app.config['SECRET_KEY'] = 'SECRET_KEY'
-    app.config['DOWNLOAD_FOLDER'] = 'download/files'
-    app.config['UPLOAD_FOLDER'] = 'upload/files'
-    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{database}'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config["STRIPE_WEBHOOK_SECRET"] = "whsec_37d8dfa8126d6786d0468c8b70fc280c605cc940209a1c1374d214c61bd9b5fb"
-    app.config["STRIPE_API_KEY"] = "sk_test_kZp1kdgQbOxszws5vvCilLrb0001bTiENk"
+    app.config.from_object(configuration.Development)
 
     login_manager.init_app(app)
     login_manager.login_view = "auth.login"
@@ -54,9 +38,8 @@ def create_app(minify=False, database=".data/database_1_2.sqlite3"):
 
     db.init_app(app)
     csrf.init_app(app)
-    if HTMLMIN is not None:
-        htmlmin.init_app(app)
-        
+    htmlmin.init_app(app)
+
     # Registrar los BP:
     from .blueprint import BLUEPRINTS
     for blueprint in BLUEPRINTS:
@@ -95,4 +78,3 @@ def register_error_handler(app):
             code = e.code
 
         return render_template("errors/error.html", error_code=str(code)), int(code)
-

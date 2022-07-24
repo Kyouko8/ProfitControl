@@ -9,7 +9,7 @@ from flask_login import current_user, login_required
 
 from . import download_bp
 from . import uploading 
-from app.models import Product
+from app.models.models import Product
 
 logger = logging.getLogger(__name__)
 

@@ -9,8 +9,8 @@ from flask_login import current_user, login_required
 
 from . import download_bp
 from .forms import LoadJSONForm
-from app.models import Product
-from app.functions import analyze_int_fields
+from app.models.models import Product
+from app.utils.functions import analyze_int_fields
 
 logger = logging.getLogger(__name__)
 

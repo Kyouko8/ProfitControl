@@ -498,13 +498,8 @@
 {% endblock %}
 
 {% block javascript %}
-{% if offline %}
-<!-- WARNING: This is load from local server -->
-<!-- Offline Mode: True -->
-<script src="{{url_for('static', filename='offline/js/canvasjs.min.js')}}"></script>
-{% else %}
+
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script> 
-{% endif %}
 
 <script src="{{url_for('static', filename='js/admin/tools/charts.js')}}"></script>
 {% endblock %}

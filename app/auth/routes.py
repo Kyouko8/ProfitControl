@@ -1,18 +1,17 @@
 """Auth routes"""
-import logging
-import json
 import datetime
-from flask import render_template, flash, redirect, request, url_for, make_response
-from flask_login import current_user, login_user, logout_user, login_required
+import json
+import logging
 
 from app import login_manager
+from app.models.models import Profile
+from flask import (flash, make_response, redirect, render_template, request,
+                   url_for)
+from flask_login import current_user, login_required, login_user, logout_user
 
 from . import auth_bp
-from .models import User
 from .forms import LoginForm, SignupForm
-
-from app.models import Profile
-
+from .models import User
 
 logger = logging.getLogger(__name__)
 

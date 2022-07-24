@@ -2,15 +2,14 @@
 import logging
 import math
 import random
-from flask import render_template, request, redirect, abort, url_for
-from flask_login import current_user, login_required
 
+from app.models.models import Note, ShoppingDay, WorkDay
+from app.utils.functions import calculate
+from flask import abort, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
 
 from . import note_bp
 from .forms import AddNoteForm
-
-from app.models import Note, WorkDay, ShoppingDay
-from app.functions import calculate
 
 logger = logging.getLogger(__name__)
 

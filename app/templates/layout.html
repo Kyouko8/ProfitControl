@@ -10,8 +10,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta name="csrf-token" content="{{ csrf_token() }}">
-	<meta name="author" content="Mendez Luca & Medina Dylan">
-	<meta name="copyright" content="Medina Dylan">
+	<meta name="author" content="DISTINTO-IT">
 	{% block meta %}
 	{% endblock %}
 
@@ -20,21 +19,7 @@
 	<!-- Original Icon: URL -> https://thenounproject.com/term/increase-cost/-->
 	<link rel="icon" href="{{url_for('static', filename='img/icon_v3.png')}}">
 
-	{% if offline %}
-	<!-- WARNING: This libs are load from local server -->
-	<!-- offline mode: 'true' -->
 
-	<!-- Google Icon Font -->
-	<link href="{{url_for('static', filename='offline/css/material_icon_v95.css')}}" rel="stylesheet">
-
-	<!-- Roboto Font -->
-	<link rel="preconnect" href="https://fonts.gstatic.com">
-	<link href="{{url_for('static', filename='offline/css/roboto.css')}}" rel="stylesheet">
-
-	<!-- Materialize CSS -->
-	<link rel="stylesheet" href="{{url_for('static', filename='offline/css/materialize_v100.min.css')}}">
-	
-	{% else %}
 	<!-- Google Icon Font -->
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
@@ -44,7 +29,6 @@
 
 	<!-- Materialize CSS -->
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-	{% endif %}
 
 	{% block cdncss %}
 	{% endblock %}
@@ -56,15 +40,9 @@
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/libs/buttons.css') }}">
 
-	{% if offline %}
-	<!-- Jquery -->
-	<script src="{{url_for('static', filename='offline/js/jquery351.min.js')}}"></script>
-
-	{% else %}
 	<!-- Jquery -->
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-	{% endif %}
 	<title>{%block title%}{%endblock%} - Profit Control</title>
 </head>
 
@@ -317,14 +295,8 @@
 	</main>
 
 	
-	{% if offline %}
-	<!-- WARNING: OFFLINE MODE "true" -->
-	<!--JavaScript at end of body for optimized loading-->
-	<script src="{{url_for('static', filename='offline/js/materializecss100.min.js')}}"></script>
-	{% else %}
 	<!--JavaScript at end of body for optimized loading-->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-	{% endif %}
 
 	{% block cdnjs %}
 	{%endblock%}

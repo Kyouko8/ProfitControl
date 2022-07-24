@@ -16,5 +16,5 @@ __pycache__/
 # Project Old Files
 .old_files/
 old_databases/
-*.old
 _/
+.*

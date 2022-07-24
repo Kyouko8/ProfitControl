@@ -6,8 +6,8 @@ from sqlalchemy.sql import func
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app import db
-from app.constants import COLUMN, INTEGER, STRING, DATETIME, BOOLEAN
-from app.models import UserConfig
+from app.utils.constants import COLUMN, INTEGER, STRING, DATETIME, BOOLEAN
+from app.models.models import UserConfig
 
 class UserSubscription(db.Model):
     __tablename__ = "user_subscription"
@@ -49,6 +49,16 @@ class UserSubscription(db.Model):
 
     def _generate_token(self):
         return secrets.token_hex(12)
+
+    def delete(self):
+        try:
+            db.session.delete(self)
+
+        except:
+            db.session.rollback()
+
+        finally:
+            db.session.commit()
 
     @staticmethod
     def get_by_token(token):
