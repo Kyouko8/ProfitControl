@@ -11,11 +11,7 @@ def main():
 
     with app_instance.app_context():
         db.create_all()
-
-    host = '0.0.0.0'
-    port = 5000
-
-    app_instance.run(host, port)
+        app_instance.run()
 
 
 if __name__ == '__main__':
