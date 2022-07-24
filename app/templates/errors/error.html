@@ -1,0 +1,35 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<section>
+
+    {% set common_erros = {
+        "400": "Fallo al enviar los datos al servidor.",
+        "403": "No tienes los privilegios para acceder a esta sección.",
+        "404": "La página que esta buscando no existe, verifique que la ruta sea la correcta.",
+        "405": "Esta URL no admite ese método. Verifique estar usando la configuración correcta.",
+        "429": "Hay demasiadas peticiones desde la misma dirección. Su conexión ha sido denegada.",
+        "500": "Hubo un error inesperado. Intente nuevamente más tarde.",
+        "503": "En este momento nuestro website está en mantenimiento. Regrese más tarde.",
+    } %}
+
+    {% if error_code in common_erros %}
+        {%  set message = common_erros[error_code] %}
+    {% else %}
+        {% set message = common_erros["500"] %}
+    {% endif %}
+
+    <div class="container">
+    
+        <div class="row center-align">
+    
+            <h1 class="bold-font">{{ error_code }}</h1>
+            <h2 class="h1-size">{{ message }}</h2>
+            
+    
+        </div>
+    
+    </div>
+</section>
+
+{% endblock %}

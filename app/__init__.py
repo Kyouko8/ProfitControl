@@ -6,6 +6,8 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 
+from werkzeug.exceptions import HTTPException
+
 try:
     from flask_htmlmin import HTMLMIN
 except ImportError:
@@ -29,7 +31,7 @@ offline = _Offline
 
 
 def configure_logging():
-    FORMAT = """%(levelname)s:    %(message)s\n"""
+    FORMAT = """[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)s]    %(message)s\n"""
     logging.basicConfig(format=FORMAT)
 
 
@@ -79,46 +81,18 @@ def create_app(minify=False, database=".data/database_1_2.sqlite3"):
     app.register_blueprint(payment_bp)
 
     register_error_handler(app)
-    before_r(app)
     configure_logging()
 
     return app
 
 # Control Errors
 def register_error_handler(app):
-    @app.errorhandler(400)  # Forbidden
-    def show_error_400(e):
-        print(e)
-        return render_template("errors/403.html"), 403
-
-    @app.errorhandler(403)  # Forbidden
-    def show_error_403(e):
-        return render_template("errors/403.html"), 403
-
-    @app.errorhandler(404)  # Not Found
-    def show_error_404(e):
-        return render_template("errors/404.html"), 404
-
-    @app.errorhandler(500)  # Server Error
-    def show_error_500(e):
-        return render_template("errors/500.html"), 500
-
-    @app.errorhandler(429) # Too Many Requests
-    def show_error_429(e):
-        print("too many requests")
-        return render_template("errors/500.html"), 429
-
     @app.errorhandler(Exception)
     def error_handler(e):
-        from werkzeug.exceptions import HTTPException
+        logging.error(f"{type(e).__name__} -> {e}")
+        code = 500
         if isinstance(e, HTTPException):
-            print(e)
+            code = e.code
 
-        return render_template("errors/500.html"), 500
-    
+        return render_template("errors/error.html", error_code=str(code)), int(code)
 
-def before_r(app):
-    @app.before_request
-    def before_request():
-        pass
-        # print(request.user_agent.platform)
