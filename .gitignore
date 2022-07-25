@@ -18,3 +18,5 @@ __pycache__/
 old_databases/
 _/
 .*
+
+app/env.py

@@ -1,9 +1,9 @@
 import os
 
-# # STRIPE_WEBHOOK_SECRET = "whsec_zfZOhz6CQLvQeB0bEfi4OCjLMok5SfXF"
-# # STRIPE_API_KEY = "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"
-
-# SECRET_KEY = "HEzjUKv1Ftg01Nz6nqHZcgiuPDQcikISCA0smTk6ZgBLljCZClldfdZw-KTdnkra0ea1O1aBHSbgu0ZWTM1I9w"
+# this file contains the secrets for the application
+# the secrets are stored in the env file, which is not tracked in the repository.
+# the env file is modified in the server
+from app.env import *
 
 class Config:
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -21,9 +21,9 @@ class Production(Config):
 	
 	SQLALCHEMY_DATABASE_URI = f"sqlite:///{PATH}/app/.database.sqlite3"
 
-	STRIPE_WEBHOOK_SECRET = os.environ.get('PC_STRIPE_WEBHOOK_SECRET')
-	STRIPE_API_KEY = os.environ.get('PC_STRIPE_API_KEY')
-	SECRET_KEY = os.environ.get('PC_SECRET_KEY')
+	STRIPE_WEBHOOK_SECRET = STRIPE_WEBHOOK_SECRET
+	STRIPE_API_KEY = STRIPE_API_KEY
+	SECRET_KEY = SECRET_KEY
 
 	DOWNLOAD_FOLDER = f'{PATH}/download/files'
 	UPLOAD_FOLDER = f'{PATH}/upload/files'
